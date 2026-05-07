@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>D2000 Passage Master</title>
+<style>
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a22;
+    --surface2: #23232e;
+    --border: #2e2e3d;
+    --text: #e8e8f0;
+    --text2: #8888a0;
+    --accent: #6c63ff;
+    --accent2: #4e46e0;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, 'Helvetica Neue', sans-serif; font-size: 16px; overflow: hidden; }
+
+  /* ─── SCREENS ─── */
+  .screen { display: none; height: 100dvh; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ─── HOME ─── */
+  #home { padding: 0; overflow: hidden; }
+  .home-header { padding: 28px 20px 12px; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .home-header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+  .home-header p { font-size: 13px; color: var(--text2); margin-top: 4px; }
+  .topic-list { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .topic-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.15s;
+    -webkit-user-select: none;
+  }
+  .topic-card:active { background: var(--surface2); }
+  .topic-card-left h2 { font-size: 17px; font-weight: 600; }
+  .topic-card-left p { font-size: 13px; color: var(--text2); margin-top: 3px; }
+  .topic-card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .topic-stars { display: flex; gap: 2px; }
+  .star { width: 10px; height: 10px; border-radius: 50%; background: var(--border); }
+  .star.lit { background: var(--accent); }
+  .topic-pct { font-size: 12px; color: var(--text2); }
+  .chevron { color: var(--text2); font-size: 20px; margin-left: 8px; }
+
+  /* ─── TOPIC MENU ─── */
+  #topic-menu { padding: 0; }
+  .screen-header {
+    display: flex;
+    align-items: center;
+    padding: 16px 16px 14px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+  .back-btn {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 17px;
+    cursor: pointer;
+    padding: 4px 8px 4px 0;
+  }
+  .screen-title { font-size: 18px; font-weight: 700; flex: 1; }
+  .mode-list { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .mode-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    cursor: pointer;
+    transition: background 0.15s;
+    -webkit-user-select: none;
+  }
+  .mode-card:active { background: var(--surface2); }
+  .mode-card-top { display: flex; align-items: center; justify-content: space-between; }
+  .mode-card h3 { font-size: 17px; font-weight: 600; }
+  .level-badge {
+    font-size: 12px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    background: var(--surface2);
+    color: var(--text2);
+    border: 1px solid var(--border);
+  }
+  .mode-card p { font-size: 13px; color: var(--text2); margin-top: 8px; line-height: 1.5; }
+  .mode-progress { margin-top: 10px; height: 4px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .mode-progress-bar { height: 100%; border-radius: 4px; background: var(--accent); transition: width 0.3s; }
+  .mode-card.locked { opacity: 0.45; pointer-events: none; }
+  .lock-hint { font-size: 12px; color: var(--yellow); margin-top: 6px; }
+
+  /* ─── STUDY SCREEN ─── */
+  #study { padding: 0; }
+  .study-progress-bar { height: 3px; background: var(--border); }
+  .study-progress-fill { height: 100%; background: var(--accent); transition: width 0.3s; }
+  .study-body { flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 20px; }
+  .sentence-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+  }
+  .sentence-num { font-size: 12px; color: var(--text2); margin-bottom: 8px; }
+  .sentence-text { font-size: 17px; line-height: 1.75; }
+  .sentence-text .glossary-word {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    cursor: pointer;
+  }
+  .glossary-tip {
+    display: none;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 10px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .glossary-tip.visible { display: block; }
+  .glossary-tip-word { font-weight: 700; color: var(--accent); }
+  .glossary-tip-ja { color: var(--green); font-weight: 600; }
+  .glossary-tip-note { color: var(--text2); font-size: 13px; margin-top: 4px; }
+  .study-footer { padding: 14px 16px; border-top: 1px solid var(--border); background: var(--surface); }
+  .btn-primary {
+    width: 100%;
+    padding: 16px;
+    border-radius: var(--radius);
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    -webkit-user-select: none;
+  }
+  .btn-primary:active { background: var(--accent2); }
+
+  /* ─── TEST SCREEN ─── */
+  #test { padding: 0; }
+  .test-meta {
+    padding: 10px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .test-counter { font-size: 13px; color: var(--text2); margin-left: auto; }
+  .progress-bar-wrap { flex: 1; height: 6px; background: var(--border); border-radius: 6px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; border-radius: 6px; background: var(--accent); transition: width 0.3s; }
+  .test-card-area { flex: 1; display: flex; flex-direction: column; padding: 16px; overflow-y: auto; }
+  .test-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 0;
+  }
+  .test-level-label { font-size: 12px; color: var(--text2); letter-spacing: 0.5px; text-transform: uppercase; }
+  .test-sentence {
+    font-size: 18px;
+    line-height: 1.8;
+    flex: 1;
+    overflow-y: auto;
+  }
+  .blank {
+    display: inline-block;
+    min-width: 60px;
+    border-bottom: 2px solid var(--accent);
+    margin: 0 2px;
+    vertical-align: bottom;
+    cursor: pointer;
+    transition: background 0.15s;
+    padding: 0 4px;
+    border-radius: 4px 4px 0 0;
+  }
+  .blank.revealed {
+    color: var(--green);
+    border-bottom-color: var(--green);
+    background: rgba(34,197,94,0.1);
+  }
+  .hint-word {
+    font-weight: 700;
+    color: var(--yellow);
+  }
+  .test-glossary-strip {
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .test-gloss-pill {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    -webkit-user-select: none;
+  }
+  .test-gloss-pill:active { border-color: var(--accent); }
+  .gloss-popup {
+    display: none;
+    position: fixed;
+    bottom: 100px;
+    left: 16px;
+    right: 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    z-index: 100;
+    font-size: 15px;
+    line-height: 1.6;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  .gloss-popup.visible { display: block; }
+  .gloss-popup-word { font-weight: 700; color: var(--accent); font-size: 17px; }
+  .gloss-popup-ja { color: var(--green); font-weight: 600; }
+  .gloss-popup-note { color: var(--text2); font-size: 13px; margin-top: 4px; }
+  .gloss-popup-close { position: absolute; top: 12px; right: 14px; color: var(--text2); font-size: 22px; cursor: pointer; line-height: 1; }
+
+  .test-actions { padding: 14px 16px; display: flex; gap: 10px; border-top: 1px solid var(--border); background: var(--surface); }
+  .btn-reveal {
+    flex: 1;
+    padding: 15px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    -webkit-user-select: none;
+  }
+  .btn-reveal:active { border-color: var(--accent); }
+  .self-assess { display: none; gap: 10px; flex: 1; }
+  .self-assess.visible { display: flex; }
+  .btn-ok {
+    flex: 1;
+    padding: 15px;
+    border-radius: var(--radius);
+    border: none;
+    background: rgba(34,197,94,0.15);
+    color: var(--green);
+    font-size: 24px;
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-user-select: none;
+  }
+  .btn-ok:active { background: rgba(34,197,94,0.3); }
+  .btn-ng {
+    flex: 1;
+    padding: 15px;
+    border-radius: var(--radius);
+    border: none;
+    background: rgba(239,68,68,0.15);
+    color: var(--red);
+    font-size: 24px;
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-user-select: none;
+  }
+  .btn-ng:active { background: rgba(239,68,68,0.3); }
+
+  /* ─── RESULT SCREEN ─── */
+  #result { justify-content: center; align-items: center; padding: 24px; text-align: center; gap: 20px; }
+  .result-icon { font-size: 64px; }
+  .result-title { font-size: 24px; font-weight: 700; }
+  .result-sub { font-size: 15px; color: var(--text2); line-height: 1.6; }
+  .result-stats { display: flex; gap: 16px; }
+  .result-stat {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .result-stat-num { font-size: 32px; font-weight: 700; }
+  .result-stat-label { font-size: 13px; color: var(--text2); margin-top: 4px; }
+  .result-stat-num.green { color: var(--green); }
+  .result-stat-num.red { color: var(--red); }
+  .result-btns { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+  .btn-secondary {
+    width: 100%;
+    padding: 15px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    -webkit-user-select: none;
+  }
+  .btn-secondary:active { background: var(--surface2); }
+
+  /* ─── LEVEL UNLOCK TOAST ─── */
+  .toast {
+    display: none;
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    z-index: 200;
+    box-shadow: 0 4px 20px rgba(108,99,255,0.5);
+  }
+  .toast.visible { display: block; animation: toastIn 0.3s ease; }
+  @keyframes toastIn { from { opacity:0; transform: translateX(-50%) translateY(-10px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+</style>
+</head>
+<body>
+
+<!-- ═══ HOME ═══ -->
+<div id="home" class="screen active">
+  <div class="home-header">
+    <h1>D2000 Passage Master</h1>
+    <p>トピックを選んで練習を開始</p>
+  </div>
+  <div class="topic-list" id="topic-list"></div>
+</div>
+
+<!-- ═══ TOPIC MENU ═══ -->
+<div id="topic-menu" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showHome()">&#8592;</button>
+    <span class="screen-title" id="topic-menu-title"></span>
+  </div>
+  <div class="mode-list" id="mode-list"></div>
+</div>
+
+<!-- ═══ STUDY ═══ -->
+<div id="study" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" id="study-back-btn">&#8592;</button>
+    <span class="screen-title" id="study-title"></span>
+  </div>
+  <div class="study-progress-bar"><div class="study-progress-fill" id="study-progress-fill"></div></div>
+  <div class="study-body" id="study-body"></div>
+  <div class="study-footer">
+    <button class="btn-primary" id="study-done-btn">完了 — テストへ</button>
+  </div>
+</div>
+
+<!-- ═══ TEST ═══ -->
+<div id="test" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" id="test-back-btn">&#8592;</button>
+    <span class="screen-title" id="test-title"></span>
+  </div>
+  <div class="test-meta">
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="test-bar"></div></div>
+    <span class="test-counter" id="test-counter"></span>
+  </div>
+  <div class="test-card-area">
+    <div class="test-card">
+      <div class="test-level-label" id="test-level-label"></div>
+      <div class="test-sentence" id="test-sentence"></div>
+      <div class="test-glossary-strip" id="test-glossary-strip"></div>
+    </div>
+  </div>
+  <div class="test-actions">
+    <button class="btn-reveal" id="btn-reveal" onclick="revealAll()">タップして確認</button>
+    <div class="self-assess" id="self-assess">
+      <button class="btn-ng" onclick="assess(false)">✗</button>
+      <button class="btn-ok" onclick="assess(true)">✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ RESULT ═══ -->
+<div id="result" class="screen">
+  <div class="result-icon" id="result-icon"></div>
+  <div class="result-title" id="result-title"></div>
+  <div class="result-sub" id="result-sub"></div>
+  <div class="result-stats">
+    <div class="result-stat"><div class="result-stat-num green" id="result-ok"></div><div class="result-stat-label">正解</div></div>
+    <div class="result-stat"><div class="result-stat-num red" id="result-ng"></div><div class="result-stat-label">要復習</div></div>
+    <div class="result-stat"><div class="result-stat-num" id="result-total"></div><div class="result-stat-label">合計</div></div>
+  </div>
+  <div class="result-btns">
+    <button class="btn-primary" id="result-retry-btn">NG文を再テスト</button>
+    <button class="btn-secondary" id="result-back-btn">トピック選択に戻る</button>
+  </div>
+</div>
+
+<!-- Glossary popup -->
+<div class="gloss-popup" id="gloss-popup">
+  <span class="gloss-popup-close" onclick="closeGlossPopup()">×</span>
+  <div class="gloss-popup-word" id="gloss-popup-word"></div>
+  <div class="gloss-popup-ja" id="gloss-popup-ja"></div>
+  <div class="gloss-popup-note" id="gloss-popup-note"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script>
+// ─── STATE ───────────────────────────────────────────────
+const STORAGE_KEY = 'd2000_progress';
+
+const LEVELS = [
+  { id: 0, name: 'Lv1 : 全文読む',       label: 'STUDY',    desc: 'まず全文を読んで意味を確認。単語をタップで解説を表示。', blankRate: 0,   hint: 'first', study: true  },
+  { id: 1, name: 'Lv2 : 20% 空欄',       label: 'LEVEL 2',  desc: 'キーワードの20%が空欄。タップして確認しながら進もう。', blankRate: 0.2, hint: 'none',  study: false },
+  { id: 2, name: 'Lv3 : 40% 空欄',       label: 'LEVEL 3',  desc: 'キーワードの40%が空欄。頭の中で先読みしながら。',       blankRate: 0.4, hint: 'none',  study: false },
+  { id: 3, name: 'Lv4 : 60% 空欄',       label: 'LEVEL 4',  desc: 'キーワードの60%が空欄。だいぶ暗唱に近い。',             blankRate: 0.6, hint: 'none',  study: false },
+  { id: 4, name: 'Lv5 : 最初の1語だけ',  label: 'LEVEL 5',  desc: '各文の最初の1語だけが表示。ほぼ完全暗唱。',             blankRate: 1,   hint: 'first', study: false },
+  { id: 5, name: 'Lv6 : 完全暗唱',       label: 'LEVEL 6',  desc: 'タイトルのみ表示。全文を声に出して再現しよう。',         blankRate: 1,   hint: 'none',  study: false },
+];
+
+let state = loadState();
+let currentTopic = null;
+let currentLevel = null;
+let queue = [];       // [{sentence, originalHtml}]
+let queueIdx = 0;
+let okCount = 0;
+let ngList = [];
+
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
+}
+function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+function getTopicState(topicId) {
+  if (!state[topicId]) state[topicId] = { maxLevel: 0, levelStats: {} };
+  return state[topicId];
+}
+function getMaxLevel(topicId) { return getTopicState(topicId).maxLevel || 0; }
+function setMaxLevel(topicId, lv) {
+  const ts = getTopicState(topicId);
+  if (lv > ts.maxLevel) { ts.maxLevel = lv; saveState(); }
+}
+function getTopicPct(topicId) {
+  const lv = getMaxLevel(topicId);
+  return Math.round((lv / (LEVELS.length - 1)) * 100);
+}
+
+// ─── HOME ────────────────────────────────────────────────
+function renderHome() {
+  const list = document.getElementById('topic-list');
+  list.innerHTML = '';
+  TOPICS.forEach(topic => {
+    const pct = getTopicPct(topic.id);
+    const maxLv = getMaxLevel(topic.id);
+    const card = document.createElement('div');
+    card.className = 'topic-card';
+    card.onclick = () => showTopicMenu(topic);
+    const stars = LEVELS.map((_, i) =>
+      `<div class="star${i <= maxLv ? ' lit' : ''}"></div>`
+    ).join('');
+    card.innerHTML = `
+      <div class="topic-card-left">
+        <h2>${topic.title}</h2>
+        <p>${topic.sentences.length} 文 · ${pct}% 完了</p>
+      </div>
+      <div class="topic-card-right">
+        <div class="topic-stars">${stars}</div>
+        <span class="topic-pct">${pct}%</span>
+      </div>
+      <span class="chevron">›</span>`;
+    list.appendChild(card);
+  });
+}
+
+function showHome() {
+  renderHome();
+  showScreen('home');
+}
+
+// ─── TOPIC MENU ──────────────────────────────────────────
+function showTopicMenu(topic) {
+  currentTopic = topic;
+  document.getElementById('topic-menu-title').textContent = topic.title;
+  const list = document.getElementById('mode-list');
+  list.innerHTML = '';
+  const maxLv = getMaxLevel(topic.id);
+
+  LEVELS.forEach((lv, i) => {
+    const unlocked = i <= maxLv + 1 && i <= maxLv + 1;
+    const locked = i > maxLv + 1;
+    const card = document.createElement('div');
+    card.className = 'mode-card' + (locked ? ' locked' : '');
+
+    const ts = getTopicState(topic.id);
+    const stat = ts.levelStats[i] || { ok: 0, total: 0 };
+    const progPct = stat.total > 0 ? Math.round(stat.ok / stat.total * 100) : 0;
+
+    card.innerHTML = `
+      <div class="mode-card-top">
+        <h3>${lv.name}</h3>
+        <span class="level-badge">${lv.label}</span>
+      </div>
+      <p>${lv.desc}</p>
+      <div class="mode-progress"><div class="mode-progress-bar" style="width:${progPct}%"></div></div>
+      ${locked ? `<div class="lock-hint">前のレベルをクリアすると解放</div>` : ''}`;
+
+    if (!locked) card.onclick = () => startLevel(topic, i);
+    list.appendChild(card);
+  });
+
+  showScreen('topic-menu');
+}
+
+// ─── STUDY MODE ──────────────────────────────────────────
+function startLevel(topic, levelIdx) {
+  currentTopic = topic;
+  currentLevel = levelIdx;
+
+  if (LEVELS[levelIdx].study) {
+    startStudy(topic, levelIdx);
+  } else {
+    startTest(topic, levelIdx, topic.sentences);
+  }
+}
+
+function startStudy(topic, levelIdx) {
+  document.getElementById('study-title').textContent = topic.title;
+  const body = document.getElementById('study-body');
+  body.innerHTML = '';
+
+  topic.sentences.forEach((s, i) => {
+    const block = document.createElement('div');
+    block.className = 'sentence-block';
+    block.innerHTML = `<div class="sentence-num">文 ${i + 1} / ${topic.sentences.length}</div>
+      <div class="sentence-text">${annotate(s)}</div>`;
+
+    // Glossary tips per sentence
+    if (s.glossary && s.glossary.length > 0) {
+      s.glossary.forEach(g => {
+        const tip = document.createElement('div');
+        tip.className = 'glossary-tip';
+        tip.id = `gtip-${s.id}-${g.word.replace(/\s/g,'_')}`;
+        tip.innerHTML = `<span class="glossary-tip-word">${g.word}</span> — <span class="glossary-tip-ja">${g.ja}</span><div class="glossary-tip-note">${g.note}</div>`;
+        block.appendChild(tip);
+      });
+    }
+    body.appendChild(block);
+  });
+
+  document.getElementById('study-progress-fill').style.width = '100%';
+  document.getElementById('study-done-btn').onclick = () => {
+    setMaxLevel(topic.id, levelIdx);
+    showTopicMenu(topic);
+  };
+  document.getElementById('study-back-btn').onclick = () => showTopicMenu(topic);
+  showScreen('study');
+}
+
+function annotate(sentence) {
+  if (!sentence.glossary || sentence.glossary.length === 0) return sentence.text;
+  let html = sentence.text;
+  // Sort by length descending to avoid partial replacements
+  const sorted = [...sentence.glossary].sort((a,b) => b.word.length - a.word.length);
+  sorted.forEach(g => {
+    const re = new RegExp(`\\b(${escapeRe(g.word)})\\b`, 'gi');
+    html = html.replace(re, (m) =>
+      `<span class="glossary-word" onclick="toggleGloss('${sentence.id}','${g.word.replace(/\s/g,'_')}')">${m}</span>`
+    );
+  });
+  return html;
+}
+
+function toggleGloss(sentenceId, wordKey) {
+  const tipId = `gtip-${sentenceId}-${wordKey}`;
+  const tip = document.getElementById(tipId);
+  if (!tip) return;
+  tip.classList.toggle('visible');
+}
+
+// ─── TEST MODE ───────────────────────────────────────────
+function startTest(topic, levelIdx, sentences) {
+  currentTopic = topic;
+  currentLevel = levelIdx;
+  queue = sentences.map(s => ({ sentence: s }));
+  queueIdx = 0;
+  okCount = 0;
+  ngList = [];
+
+  document.getElementById('test-title').textContent = `${topic.title} · ${LEVELS[levelIdx].name}`;
+  document.getElementById('test-back-btn').onclick = () => showTopicMenu(topic);
+  showScreen('test');
+  renderTestCard();
+}
+
+function renderTestCard() {
+  if (queueIdx >= queue.length) {
+    showResult();
+    return;
+  }
+
+  const lv = LEVELS[currentLevel];
+  const { sentence } = queue[queueIdx];
+  const total = queue.length;
+
+  document.getElementById('test-bar').style.width = `${(queueIdx / total) * 100}%`;
+  document.getElementById('test-counter').textContent = `${queueIdx + 1} / ${total}`;
+  document.getElementById('test-level-label').textContent = lv.label;
+
+  document.getElementById('btn-reveal').style.display = '';
+  document.getElementById('self-assess').classList.remove('visible');
+
+  // Build masked HTML
+  const html = buildMasked(sentence, lv);
+  document.getElementById('test-sentence').innerHTML = html;
+
+  // Glossary pills
+  const strip = document.getElementById('test-glossary-strip');
+  strip.innerHTML = '';
+  if (sentence.glossary && sentence.glossary.length > 0) {
+    sentence.glossary.forEach(g => {
+      const pill = document.createElement('span');
+      pill.className = 'test-gloss-pill';
+      pill.textContent = g.word;
+      pill.onclick = () => openGlossPopup(g);
+      strip.appendChild(pill);
+    });
+  }
+
+  // Store revealed html for reveal button
+  queue[queueIdx]._revealedHtml = buildFull(sentence);
+}
+
+function buildMasked(sentence, lv) {
+  if (lv.id === 0) return buildFull(sentence); // study mode fallback
+  if (lv.id === 5) {
+    // Level 6: title only shown in test screen title; show blank line
+    return `<span style="color:var(--text2);font-size:15px;">全文を暗唱してください...</span>`;
+  }
+  if (lv.hint === 'first' && lv.blankRate === 1) {
+    // Level 5: first word only
+    const words = sentence.text.split(' ');
+    const first = words[0];
+    const rest = words.slice(1).map(w => `<span class="blank" data-word="${escHtml(w)}">${'_'.repeat(Math.min(w.replace(/[.,!?;:]/g,'').length, 8))}</span>`);
+    return `<span class="hint-word">${escHtml(first)}</span> ` + rest.join(' ');
+  }
+
+  // Levels 2-4: blank out blankRate fraction of words
+  const words = sentence.text.split(' ');
+  // Pick indices to blank: prioritize glossary words, then others
+  const rate = lv.blankRate;
+  const glossarySet = new Set((sentence.glossary || []).flatMap(g => g.word.toLowerCase().split(' ')));
+
+  const indices = [];
+  words.forEach((w, i) => {
+    const clean = w.replace(/[.,!?;:'"]/g, '').toLowerCase();
+    if (glossarySet.has(clean) && clean.length > 2) indices.push({ i, priority: 1 });
+    else if (clean.length > 4) indices.push({ i, priority: 0 });
+  });
+
+  // Stable sort: glossary first, then long words
+  indices.sort((a,b) => b.priority - a.priority);
+  const numToBlank = Math.round(words.length * rate);
+  const blankSet = new Set(indices.slice(0, numToBlank).map(x => x.i));
+
+  return words.map((w, i) => {
+    if (blankSet.has(i)) {
+      const clean = w.replace(/[.,!?;:'"]$/, '');
+      const punct = w.slice(clean.length);
+      return `<span class="blank" data-word="${escHtml(w)}">${'_'.repeat(Math.min(clean.replace(/[.,!?;:]/g,'').length, 10))}</span>${escHtml(punct)}`;
+    }
+    return escHtml(w);
+  }).join(' ');
+}
+
+function buildFull(sentence) {
+  return escHtml(sentence.text);
+}
+
+function revealAll() {
+  const lv = LEVELS[currentLevel];
+  if (lv.id === 5) {
+    // Level 6: reveal full text
+    document.getElementById('test-sentence').innerHTML = `<span style="color:var(--green)">${escHtml(queue[queueIdx].sentence.text)}</span>`;
+  } else {
+    // Reveal all blanks
+    document.getElementById('test-sentence').querySelectorAll('.blank').forEach(el => {
+      el.textContent = el.dataset.word;
+      el.classList.add('revealed');
+    });
+  }
+  document.getElementById('btn-reveal').style.display = 'none';
+  document.getElementById('self-assess').classList.add('visible');
+}
+
+function assess(ok) {
+  const { sentence } = queue[queueIdx];
+  if (ok) {
+    okCount++;
+  } else {
+    ngList.push(sentence);
+  }
+  queueIdx++;
+  renderTestCard();
+}
+
+// ─── RESULT ──────────────────────────────────────────────
+function showResult() {
+  const total = queue.length;
+  const ng = ngList.length;
+  const ok = okCount;
+  const pct = Math.round(ok / total * 100);
+
+  // Update level stats
+  const ts = getTopicState(currentTopic.id);
+  if (!ts.levelStats) ts.levelStats = {};
+  ts.levelStats[currentLevel] = { ok, total };
+  saveState();
+
+  // Unlock next level if >=80% or it's study mode
+  if (LEVELS[currentLevel].study || pct >= 80) {
+    const wasMax = getMaxLevel(currentTopic.id);
+    setMaxLevel(currentTopic.id, currentLevel + 1);
+    if (currentLevel + 1 > wasMax) {
+      setTimeout(() => showToast(`Lv${currentLevel + 2} 解放！`), 300);
+    }
+  }
+
+  document.getElementById('result-icon').textContent = pct >= 80 ? '🎉' : pct >= 50 ? '💪' : '📖';
+  document.getElementById('result-title').textContent = pct >= 80 ? 'クリア！' : pct >= 50 ? 'もう少し！' : '練習あるのみ';
+  document.getElementById('result-sub').textContent = `正解率 ${pct}%`;
+  document.getElementById('result-ok').textContent = ok;
+  document.getElementById('result-ng').textContent = ng;
+  document.getElementById('result-total').textContent = total;
+
+  const retryBtn = document.getElementById('result-retry-btn');
+  if (ngList.length > 0) {
+    retryBtn.style.display = '';
+    retryBtn.onclick = () => startTest(currentTopic, currentLevel, ngList);
+  } else {
+    retryBtn.style.display = 'none';
+  }
+  document.getElementById('result-back-btn').onclick = () => showTopicMenu(currentTopic);
+
+  showScreen('result');
+}
+
+// ─── GLOSSARY POPUP ──────────────────────────────────────
+function openGlossPopup(g) {
+  document.getElementById('gloss-popup-word').textContent = g.word;
+  document.getElementById('gloss-popup-ja').textContent = g.ja;
+  document.getElementById('gloss-popup-note').textContent = g.note;
+  document.getElementById('gloss-popup').classList.add('visible');
+}
+function closeGlossPopup() {
+  document.getElementById('gloss-popup').classList.remove('visible');
+}
+document.getElementById('gloss-popup').addEventListener('click', e => {
+  if (e.target === document.getElementById('gloss-popup')) closeGlossPopup();
+});
+
+// ─── UTILS ───────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  closeGlossPopup();
+}
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('visible');
+  setTimeout(() => t.classList.remove('visible'), 2500);
+}
+
+// ─── INIT ────────────────────────────────────────────────
+renderHome();
+</script>
+</body>
+</html>
