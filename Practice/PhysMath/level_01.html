@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Level 1 — ベクトル解析</title>
+  <script>
+    MathJax = { tex: { inlineMath: [['\\(','\\)'],['$','$']], displayMath: [['\\[','\\]'],['$$','$$']], tags: 'ams' } };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; padding: 40px 20px; line-height: 1.8; }
+    .container { max-width: 860px; margin: 0 auto; }
+    h1 { font-size: 1.6rem; color: #f8fafc; margin-bottom: 4px; }
+    .meta { color: #64748b; font-size: 0.88rem; margin-bottom: 40px; }
+    .problem { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 24px 28px; margin: 28px 0; }
+    .problem-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .pnum { background: #6366f1; color: white; font-weight: 700; font-size: 0.85rem; padding: 3px 12px; border-radius: 20px; }
+    .ptitle { font-size: 1.05rem; color: #f1f5f9; font-weight: 600; }
+    .context { background: #0f172a; border-left: 3px solid #6366f1; padding: 10px 16px; margin-bottom: 14px; font-size: 0.88rem; color: #94a3b8; border-radius: 0 6px 6px 0; }
+    .hint { background: #0f172a; border: 1px solid #f59e0b; border-radius: 6px; padding: 12px 16px; margin-top: 14px; font-size: 0.87rem; color: #fcd34d; }
+    .hint strong { color: #fbbf24; }
+    p { color: #cbd5e1; margin-bottom: 10px; }
+    h3 { color: #94a3b8; font-size: 0.95rem; margin: 16px 0 6px; }
+    .nav { display: flex; justify-content: space-between; margin-top: 48px; }
+    .btn { padding: 10px 20px; border-radius: 6px; text-decoration: none; font-size: 0.88rem; font-weight: 600; }
+    .btn-back { background: #1e293b; color: #94a3b8; border: 1px solid #475569; }
+    .btn-ans { background: #6366f1; color: white; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Level 1 ★☆☆☆☆☆☆ — ベクトル解析</h1>
+  <p class="meta">テーマ: grad / div / curl / Gauss定理 / Stokes定理　|　Introductionのセクション1を参照</p>
+
+  <!-- Problem 1 -->
+  <div class="problem">
+    <div class="problem-header">
+      <span class="pnum">問題 1</span>
+      <span class="ptitle">スカラー場の勾配と方向微分</span>
+    </div>
+    <div class="context">物理的文脈：温度場や電位場の空間変化を記述する。</div>
+    <p>スカラー場 \(\phi(x,y,z) = x^2 y + y z^2\) について、以下を求めよ。</p>
+    <h3>（1）</h3>
+    <p>点 \(P = (1, 2, -1)\) における勾配 \(\nabla\phi\Big|_P\) を求めよ。</p>
+    <h3>（2）</h3>
+    <p>点 \(P\) において、方向 \(\mathbf{n} = \dfrac{1}{\sqrt{3}}(1,1,1)\) への方向微分 \(D_\mathbf{n}\phi\) を求めよ。</p>
+    <h3>（3）</h3>
+    <p>\(\phi\) が最も急激に増加する方向と、そのときの変化率を求めよ。</p>
+    <div class="hint">
+      <strong>ヒント：</strong> 方向微分は \(D_\mathbf{n}\phi = \nabla\phi\cdot\mathbf{n}\)。最大変化率は \(|\nabla\phi|\)。
+    </div>
+  </div>
+
+  <!-- Problem 2 -->
+  <div class="problem">
+    <div class="problem-header">
+      <span class="pnum">問題 2</span>
+      <span class="ptitle">電場の発散とGaussの法則</span>
+    </div>
+    <div class="context">物理的文脈：Gaussの法則 \(\nabla\cdot\mathbf{E} = \rho/\varepsilon_0\) により電荷分布と電場を結ぶ。</div>
+    <p>電場 \(\mathbf{E}(x,y,z) = \left(2xz,\,-y^2,\,y^2 z\right)\) について、以下を求めよ。</p>
+    <h3>（1）</h3>
+    <p>発散 \(\nabla\cdot\mathbf{E}\) を計算せよ。</p>
+    <h3>（2）</h3>
+    <p>Gaussの法則 \(\nabla\cdot\mathbf{E} = \rho/\varepsilon_0\) を用いて、点 \((1,1,1)\) における電荷密度 \(\rho\) を求めよ。</p>
+    <h3>（3）</h3>
+    <p>辺長 2 の立方体領域 \(V = \{0\le x,y,z\le 2\}\) におけるGaussの定理：
+    \[\oiint_S \mathbf{E}\cdot d\mathbf{S} = \iiint_V \nabla\cdot\mathbf{E}\,dV\]
+    を直接体積積分を計算することで確認せよ。</p>
+    <div class="hint">
+      <strong>ヒント：</strong> (3) では体積積分 \(\iiint_V (2z - 2y + y^2)\,dV\) を各変数で順に積分する。
+    </div>
+  </div>
+
+  <!-- Problem 3 -->
+  <div class="problem">
+    <div class="problem-header">
+      <span class="pnum">問題 3</span>
+      <span class="ptitle">磁場の回転とStokesの定理</span>
+    </div>
+    <div class="context">物理的文脈：アンペール（準定常）の法則 \(\nabla\times\mathbf{B} = \mu_0\mathbf{J}\)。</div>
+    <p>ベクトル場 \(\mathbf{F}(x,y,z) = \left(-y,\,x,\,0\right)\) について、以下を求めよ。</p>
+    <h3>（1）</h3>
+    <p>回転 \(\nabla\times\mathbf{F}\) を計算せよ。</p>
+    <h3>（2）</h3>
+    <p>\(xy\) 平面上の半径 \(R\) の円盤 \(S: x^2+y^2\le R^2,\; z=0\) に対してStokesの定理を用い：
+    \[\oint_C \mathbf{F}\cdot d\mathbf{l} = \iint_S (\nabla\times\mathbf{F})\cdot d\mathbf{S}\]
+    の両辺を直接計算し、一致することを確認せよ。</p>
+    <h3>（3）</h3>
+    <p>この \(\mathbf{F}\) が一様な角速度 \(\omega\) で回転する剛体の速度場 \(\mathbf{v} = \boldsymbol{\omega}\times\mathbf{r}\)（\(\boldsymbol{\omega} = \omega\mathbf{e}_z\)）と一致することを示し、\(\nabla\times\mathbf{v} = 2\boldsymbol{\omega}\) を確認せよ。</p>
+    <div class="hint">
+      <strong>ヒント：</strong> (2) 左辺：円周上で \(x = R\cos\theta,\, y = R\sin\theta\) とパラメータ化。
+    </div>
+  </div>
+
+  <!-- Problem 4 -->
+  <div class="problem">
+    <div class="problem-header">
+      <span class="pnum">問題 4</span>
+      <span class="ptitle">重力ポテンシャルとLaplacian</span>
+    </div>
+    <div class="context">物理的文脈：点質量の重力ポテンシャルと Poisson 方程式 \(\nabla^2\phi = 4\pi G\rho\)。</div>
+    <p>\(r = \sqrt{x^2+y^2+z^2}\)（\(r > 0\)）として、ポテンシャル \(\phi = -\dfrac{GM}{r}\) について答えよ。</p>
+    <h3>（1）</h3>
+    <p>\(\nabla\phi\) を計算し、重力加速度 \(\mathbf{g} = -\nabla\phi\) が \(\mathbf{g} = -\dfrac{GM}{r^3}\mathbf{r}\) であることを示せ。</p>
+    <h3>（2）</h3>
+    <p>\(r > 0\) の領域でのLaplacian \(\nabla^2\phi\) を計算し、真空中のLaplace方程式 \(\nabla^2\phi = 0\) が満たされることを示せ。</p>
+    <p class="hint" style="border-color:#6366f1; color:#94a3b8; margin-top:10px">
+      \(r\)の偏微分：\(\dfrac{\partial r}{\partial x} = \dfrac{x}{r}\)，球対称関数のLaplacian：\(\nabla^2 f(r) = f''(r) + \dfrac{2}{r}f'(r)\)</p>
+    <h3>（3）</h3>
+    <p>\(r^n\) 型の関数 \(f = r^n\) に対して \(\nabla^2(r^n) = n(n+1)r^{n-2}\) を示せ。</p>
+    <div class="hint">
+      <strong>ヒント：</strong> \(\nabla^2(1/r) = 0\) は (2) の特殊ケース（\(n = -1\)）で確認できる（\(r>0\)）。
+    </div>
+  </div>
+
+  <div class="nav">
+    <a class="btn btn-back" href="index.html">← 一覧</a>
+    <a class="btn btn-ans" href="level_01_answer.html">解答を見る →</a>
+  </div>
+</div>
+</body>
+</html>

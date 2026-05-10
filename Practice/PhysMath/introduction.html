@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Introduction — 物理数学の基礎知識</title>
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['\\(','\\)'], ['$','$']], displayMath: [['\\[','\\]'],['$$','$$']], tags: 'ams' },
+      options: { skipHtmlTags: ['script','noscript','style','textarea'] }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; padding: 40px 20px; line-height: 1.8; }
+    .container { max-width: 900px; margin: 0 auto; }
+    h1 { font-size: 1.8rem; color: #f8fafc; margin-bottom: 8px; }
+    .meta { color: #64748b; margin-bottom: 48px; font-size: 0.9rem; }
+    h2 { font-size: 1.3rem; color: #818cf8; margin: 48px 0 16px; border-left: 4px solid #6366f1; padding-left: 14px; }
+    h3 { font-size: 1.05rem; color: #a5b4fc; margin: 28px 0 10px; }
+    p { color: #cbd5e1; margin-bottom: 14px; }
+    .box { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 20px 24px; margin: 16px 0; }
+    .box.accent { border-color: #6366f1; }
+    .box.warn { border-color: #f59e0b; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; }
+    th { background: #1e293b; color: #94a3b8; padding: 10px 14px; text-align: left; border: 1px solid #334155; font-size: 0.88rem; }
+    td { padding: 10px 14px; border: 1px solid #334155; font-size: 0.88rem; color: #cbd5e1; }
+    .nav { display: flex; justify-content: flex-end; margin-top: 60px; }
+    .btn { padding: 10px 24px; border-radius: 6px; text-decoration: none; font-size: 0.9rem; font-weight: 600; background: #6366f1; color: white; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Introduction — 物理数学の基礎知識</h1>
+  <p class="meta">問題に取り組む前に必要な概念・公式をまとめています。</p>
+
+  <!-- ===== 1. ベクトル解析 ===== -->
+  <h2>1. ベクトル解析</h2>
+
+  <h3>1.1 微分演算子 ∇（ナブラ）</h3>
+  <p>デカルト座標 \((x,y,z)\) でのナブラ演算子：</p>
+  <div class="box">
+    \[ \nabla = \mathbf{e}_x\frac{\partial}{\partial x} + \mathbf{e}_y\frac{\partial}{\partial y} + \mathbf{e}_z\frac{\partial}{\partial z} \]
+  </div>
+
+  <table>
+    <tr><th>演算</th><th>定義</th><th>入力→出力</th></tr>
+    <tr><td><strong>勾配（grad）</strong> \(\nabla\phi\)</td><td>\(\left(\dfrac{\partial\phi}{\partial x},\,\dfrac{\partial\phi}{\partial y},\,\dfrac{\partial\phi}{\partial z}\right)\)</td><td>スカラー場 → ベクトル場</td></tr>
+    <tr><td><strong>発散（div）</strong> \(\nabla\cdot\mathbf{F}\)</td><td>\(\dfrac{\partial F_x}{\partial x}+\dfrac{\partial F_y}{\partial y}+\dfrac{\partial F_z}{\partial z}\)</td><td>ベクトル場 → スカラー場</td></tr>
+    <tr><td><strong>回転（curl）</strong> \(\nabla\times\mathbf{F}\)</td><td>行列式で定義（下記）</td><td>ベクトル場 → ベクトル場</td></tr>
+    <tr><td><strong>ラプラシアン</strong> \(\nabla^2\phi\)</td><td>\(\dfrac{\partial^2\phi}{\partial x^2}+\dfrac{\partial^2\phi}{\partial y^2}+\dfrac{\partial^2\phi}{\partial z^2}\)</td><td>スカラー場 → スカラー場</td></tr>
+  </table>
+
+  <div class="box">
+    \[\nabla\times\mathbf{F} = \begin{vmatrix}\mathbf{e}_x & \mathbf{e}_y & \mathbf{e}_z \\ \partial_x & \partial_y & \partial_z \\ F_x & F_y & F_z\end{vmatrix}\]
+  </div>
+
+  <h3>1.2 主要な積分定理</h3>
+  <div class="box accent">
+    <p><strong>Gaussの定理（発散定理）：</strong></p>
+    \[\oiint_S \mathbf{F}\cdot d\mathbf{S} = \iiint_V (\nabla\cdot\mathbf{F})\,dV\]
+    <p style="margin-top:12px"><strong>Stokesの定理：</strong></p>
+    \[\oint_C \mathbf{F}\cdot d\mathbf{l} = \iint_S (\nabla\times\mathbf{F})\cdot d\mathbf{S}\]
+  </div>
+
+  <h3>1.3 重要な恒等式</h3>
+  <div class="box">
+    \[\nabla\times(\nabla\phi) = \mathbf{0}, \qquad \nabla\cdot(\nabla\times\mathbf{F}) = 0\]
+    \[\nabla\times(\nabla\times\mathbf{F}) = \nabla(\nabla\cdot\mathbf{F}) - \nabla^2\mathbf{F}\]
+    \[\nabla(fg) = f\nabla g + g\nabla f\]
+  </div>
+
+  <!-- ===== 2. ODE ===== -->
+  <h2>2. 常微分方程式</h2>
+
+  <h3>2.1 2階線形ODE（定数係数）</h3>
+  <div class="box">
+    \[ a\ddot{x} + b\dot{x} + cx = f(t) \]
+    <p style="margin-top:10px">特性方程式 \(a\lambda^2 + b\lambda + c = 0\) の根 \(\lambda_{1,2}\) で場合分け：</p>
+    <table style="margin-top:8px">
+      <tr><th>判別式 \(\Delta = b^2-4ac\)</th><th>解の形</th></tr>
+      <tr><td>\(\Delta > 0\)（過減衰）</td><td>\(x = C_1 e^{\lambda_1 t} + C_2 e^{\lambda_2 t}\)</td></tr>
+      <tr><td>\(\Delta = 0\)（臨界減衰）</td><td>\(x = (C_1 + C_2 t)e^{\lambda t}\)</td></tr>
+      <tr><td>\(\Delta < 0\)（不足減衰）</td><td>\(x = e^{\alpha t}(C_1\cos\omega t + C_2\sin\omega t)\)</td></tr>
+    </table>
+  </div>
+
+  <h3>2.2 強制振動と共鳴</h3>
+  <p>方程式 \(m\ddot{x} + kx = F_0\cos\omega t\) （\(\omega_0 = \sqrt{k/m}\)）の特解：</p>
+  <div class="box">
+    \[ x_p = \frac{F_0/m}{\omega_0^2 - \omega^2}\cos\omega t \quad (\omega \neq \omega_0)\]
+    <p style="margin-top:10px">共鳴条件 \(\omega = \omega_0\) では特解が \(x_p = \dfrac{F_0}{2m\omega_0}t\sin\omega_0 t\) となり振幅が時間と共に増大する。</p>
+  </div>
+
+  <!-- ===== 3. テンソル ===== -->
+  <h2>3. テンソル記法とEinstein縮約記法</h2>
+
+  <h3>3.1 Einstein縮約記法</h3>
+  <div class="box accent">
+    <p>同じ添え字が上下（または同じ位置に2回）現れたら <strong>その添え字について和をとる</strong>：</p>
+    \[ A^i B_i \equiv \sum_{i=1}^{3} A^i B_i = A^1B_1 + A^2B_2 + A^3B_3 \]
+    \[ T^i{}_j x^j \equiv \sum_j T^i{}_j x^j \]
+  </div>
+
+  <h3>3.2 テンソルの変換則</h3>
+  <div class="box">
+    <p>座標変換 \(x^{i'} = R^{i'}{}_{i}\, x^i\) に対して：</p>
+    \[ V^{i'} = R^{i'}{}_{i}\, V^i \quad\text{（共変ベクトル）}\]
+    \[ T^{i'j'} = R^{i'}{}_{i}\, R^{j'}{}_{j}\, T^{ij} \quad\text{（2階反変テンソル）}\]
+  </div>
+
+  <h3>3.3 Levi-Civitaシンボル</h3>
+  <div class="box">
+    \[ \varepsilon_{ijk} = \begin{cases} +1 & (i,j,k)\text{が}(1,2,3)\text{の偶置換} \\ -1 & \text{奇置換} \\ 0 & \text{重複あり}\end{cases}\]
+    \[\text{クロス積：}\quad (A\times B)^i = \varepsilon^{ijk}A_j B_k\]
+    \[\text{重要恒等式：}\quad \varepsilon_{ijk}\varepsilon^{ilm} = \delta^l_j\delta^m_k - \delta^m_j\delta^l_k\]
+  </div>
+
+  <h3>3.4 Christoffel記号と共変微分</h3>
+  <div class="box">
+    \[ \Gamma^\lambda_{\mu\nu} = \frac{1}{2}g^{\lambda\sigma}\left(\partial_\mu g_{\nu\sigma} + \partial_\nu g_{\mu\sigma} - \partial_\sigma g_{\mu\nu}\right) \]
+    <p style="margin-top:10px">ベクトルの共変微分：</p>
+    \[ \nabla_\mu V^\nu = \partial_\mu V^\nu + \Gamma^\nu_{\mu\lambda} V^\lambda \]
+  </div>
+
+  <!-- ===== 4. フーリエ ===== -->
+  <h2>4. フーリエ解析</h2>
+
+  <h3>4.1 フーリエ級数</h3>
+  <div class="box">
+    <p>周期 \(2L\) の関数 \(f(x)\)：</p>
+    \[ f(x) = \frac{a_0}{2} + \sum_{n=1}^\infty\left(a_n\cos\frac{n\pi x}{L} + b_n\sin\frac{n\pi x}{L}\right) \]
+    \[ a_n = \frac{1}{L}\int_{-L}^{L}f(x)\cos\frac{n\pi x}{L}dx, \quad b_n = \frac{1}{L}\int_{-L}^{L}f(x)\sin\frac{n\pi x}{L}dx \]
+  </div>
+
+  <h3>4.2 フーリエ変換</h3>
+  <div class="box">
+    \[ \hat{f}(\omega) = \int_{-\infty}^{\infty} f(t)\,e^{-i\omega t}\,dt, \qquad f(t) = \frac{1}{2\pi}\int_{-\infty}^{\infty}\hat{f}(\omega)\,e^{i\omega t}\,d\omega \]
+    <p style="margin-top:10px"><strong>Parsevalの定理：</strong> \(\displaystyle\int_{-\infty}^\infty |f(t)|^2 dt = \frac{1}{2\pi}\int_{-\infty}^\infty|\hat{f}(\omega)|^2 d\omega\)</p>
+  </div>
+
+  <!-- ===== 5. 変分法 ===== -->
+  <h2>5. 変分法</h2>
+
+  <h3>5.1 Euler-Lagrange方程式</h3>
+  <div class="box accent">
+    <p>汎関数 \(\displaystyle I[y] = \int_{x_1}^{x_2} F(x,\,y,\,y')\,dx\) を停留させる \(y(x)\) が満たす方程式：</p>
+    \[ \frac{\partial F}{\partial y} - \frac{d}{dx}\frac{\partial F}{\partial y'} = 0 \]
+  </div>
+
+  <h3>5.2 Lagrange形式（力学）</h3>
+  <div class="box">
+    <p>Lagrangian \(L = T - V\)（運動エネルギー − ポテンシャルエネルギー）に対して：</p>
+    \[ \frac{d}{dt}\frac{\partial L}{\partial \dot{q}_i} - \frac{\partial L}{\partial q_i} = 0 \]
+    <p style="margin-top:10px">Hamiltonian \(H = \displaystyle\sum_i p_i\dot{q}_i - L\)（\(p_i = \partial L/\partial\dot{q}_i\)）に対してHamiltonの正準方程式：</p>
+    \[ \dot{q}_i = \frac{\partial H}{\partial p_i}, \qquad \dot{p}_i = -\frac{\partial H}{\partial q_i} \]
+  </div>
+
+  <!-- ===== 6. 特殊相対論 ===== -->
+  <h2>6. 特殊相対論の数学</h2>
+
+  <h3>6.1 Minkowski計量</h3>
+  <div class="box">
+    \[ \eta_{\mu\nu} = \mathrm{diag}(-1,+1,+1,+1), \qquad ds^2 = -c^2dt^2 + dx^2 + dy^2 + dz^2 \]
+    <p style="margin-top:10px">4元ベクトル添え字は \(\mu,\nu = 0,1,2,3\) \quad（\(x^0 = ct\)）</p>
+  </div>
+
+  <h3>6.2 電磁場テンソル</h3>
+  <div class="box">
+    \[ F^{\mu\nu} = \partial^\mu A^\nu - \partial^\nu A^\mu, \qquad
+    F^{\mu\nu} = \begin{pmatrix}0 & -E_x/c & -E_y/c & -E_z/c \\ E_x/c & 0 & -B_z & B_y \\ E_y/c & B_z & 0 & -B_x \\ E_z/c & -B_y & B_x & 0\end{pmatrix}\]
+  </div>
+
+  <div class="nav">
+    <a class="btn" href="index.html">← 問題一覧へ</a>
+  </div>
+</div>
+</body>
+</html>

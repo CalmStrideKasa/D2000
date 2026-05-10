@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Lv.4 — 偏微分方程式</title>
+  <script>MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style']}}</script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;padding:20px 16px;line-height:1.7;min-height:100vh}
+    .header{max-width:520px;margin:0 auto 20px}
+    .title{font-size:1.1rem;color:#f8fafc;font-weight:700;margin-bottom:10px}
+    .prog-bar-wrap{background:#1e293b;border-radius:99px;height:6px;margin-bottom:6px}
+    .prog-bar{background:#6366f1;height:6px;border-radius:99px;transition:width 0.3s}
+    .prog-text{font-size:0.78rem;color:#64748b;text-align:right}
+    .card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;max-width:520px;margin:0 auto}
+    .qnum{display:inline-block;background:#6366f1;color:white;font-size:0.75rem;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:12px}
+    .qtext{color:#f1f5f9;font-size:0.97rem;margin-bottom:18px;line-height:1.8}
+    .opt{display:block;width:100%;text-align:left;background:#0f172a;border:1px solid #334155;color:#e2e8f0;padding:14px 16px;border-radius:8px;margin-bottom:10px;font-size:0.93rem;cursor:pointer;transition:border-color 0.15s,background 0.15s;line-height:1.6}
+    .opt:hover:not(:disabled){border-color:#6366f1;background:#1e293b}
+    .opt.correct{background:#064e3b;border-color:#10b981;color:#6ee7b7}
+    .opt.wrong{background:#450a0a;border-color:#ef4444;color:#fca5a5}
+    .opt:disabled{cursor:default}
+    .explain{display:none;background:#0f172a;border-left:3px solid #6366f1;border-radius:0 8px 8px 0;padding:14px 16px;margin-top:4px;font-size:0.88rem;color:#94a3b8;line-height:1.8}
+    .explain.show{display:block}
+    .explain strong{color:#818cf8}
+    .next-btn{display:none;width:100%;background:#6366f1;color:white;border:none;padding:14px;border-radius:8px;font-size:0.97rem;font-weight:600;cursor:pointer;margin-top:14px}
+    .next-btn.show{display:block}
+    .result{text-align:center;padding:32px 16px;max-width:520px;margin:0 auto}
+    .result h2{font-size:1.4rem;color:#f8fafc;margin-bottom:12px}
+    .score{font-size:3rem;font-weight:700;color:#6366f1;margin:16px 0}
+    .score span{font-size:1.2rem;color:#94a3b8}
+    .result p{color:#94a3b8;margin-bottom:24px}
+    .result-btns{display:flex;gap:10px;flex-direction:column}
+    .btn-retry{background:#6366f1;color:white;border:none;padding:14px;border-radius:8px;font-size:0.97rem;font-weight:600;cursor:pointer}
+    .btn-back{background:#1e293b;color:#94a3b8;border:1px solid #475569;padding:14px;border-radius:8px;font-size:0.97rem;font-weight:600;cursor:pointer;text-decoration:none;display:block;text-align:center}
+    .nav{max-width:520px;margin:16px auto 0;text-align:center}
+    .nav a{color:#64748b;font-size:0.82rem;text-decoration:none}
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="title">Lv.4 偏微分方程式</div>
+  <div class="prog-bar-wrap"><div class="prog-bar" id="bar" style="width:0%"></div></div>
+  <div class="prog-text" id="prog">0 / 10</div>
+</div>
+<div id="app"></div>
+<div class="nav"><a href="index.html">← クイズ一覧</a></div>
+
+<script>
+const Q = [
+  {
+    q: '波動方程式 \\(u_{tt}=c^2 u_{xx}\\) に変数分離 \\(u=X(x)T(t)\\) を代入すると、どのような等式が得られるか？',
+    opts: [
+      '\\(X\'\'/X = T\'\'/(c^2 T) = -\\lambda\\)（定数）',
+      '\\(X\'\'/X = T\'\'/(c^2 T) = \\lambda x\\)',
+      '\\(X\' T = c^2 X T\'\\)',
+      '\\(X\'\' + T\'\' = c^2\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> 代入すると \\(XT\'\'=c^2X\'\'T\\)、両辺を \\(c^2 XT\\) で割ると \\(T\'\'/(c^2T)=X\'\'/X\\)。左辺は \\(t\\) のみ、右辺は \\(x\\) のみの関数なので、両辺は共通の定数 \\(-\\lambda\\) でなければなりません。これが変数分離の核心です。'
+  },
+  {
+    q: '境界条件 \\(X(0)=X(L)=0\\) を満たす固有値 \\(\\lambda_n\\) と固有関数 \\(X_n\\) の正しい組み合わせはどれか？',
+    opts: [
+      '\\(\\lambda_n=(n\\pi/L)^2\\)、\\(X_n=\\sin(n\\pi x/L)\\)',
+      '\\(\\lambda_n=n^2/L^2\\)、\\(X_n=\\cos(n\\pi x/L)\\)',
+      '\\(\\lambda_n=n\\pi/L\\)、\\(X_n=e^{in\\pi x/L}\\)',
+      '\\(\\lambda_n=0\\)、\\(X_n=\\text{const}\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\(X\'\'=-\\lambda X\\)、\\(X(0)=X(L)=0\\)。解は \\(X=A\\sin\\sqrt{\\lambda}x+B\\cos\\sqrt{\\lambda}x\\)。\\(X(0)=0\\) から \\(B=0\\)。\\(X(L)=0\\) から \\(\\sin\\sqrt{\\lambda}L=0\\)、つまり \\(\\sqrt{\\lambda}L=n\\pi\\)、\\(\\lambda_n=(n\\pi/L)^2\\)。'
+  },
+  {
+    q: '熱伝導方程式 \\(T_t=\\kappa T_{xx}\\) で変数分離した解の時間部分 \\(T(t)\\) の形はどれか？',
+    opts: [
+      '\\(e^{-\\kappa\\lambda_n t}\\)',
+      '\\(\\cos(\\sqrt{\\kappa\\lambda_n}\\,t)\\)',
+      '\\(e^{\\kappa\\lambda_n t}\\)',
+      '\\(t^{-\\kappa\\lambda_n}\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> 変数分離で \\(T\'/T=-\\kappa\\lambda\\)（\\(\\lambda>0\\)）。これを解くと \\(T(t)=Ce^{-\\kappa\\lambda t}\\)。時間とともに指数減衰します。波動方程式（振動）と対照的で、熱方程式では高次モード（\\(\\lambda_n\\) 大）が速く消えていきます。'
+  },
+  {
+    q: 'Fourier正弦展開で \\(T_0=\\sum_n b_n\\sin(n\\pi x/L)\\) の係数 \\(b_n\\) はどれか？',
+    opts: [
+      '\\(b_n=\\dfrac{2T_0}{n\\pi}(1-\\cos n\\pi)\\)',
+      '\\(b_n=\\dfrac{T_0}{n\\pi}\\sin n\\pi\\)',
+      '\\(b_n=T_0\\delta_{n1}\\)',
+      '\\(b_n=\\dfrac{2T_0}{L}\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> 直交性 \\(\\int_0^L\\sin(n\\pi x/L)\\sin(m\\pi x/L)dx=\\frac{L}{2}\\delta_{nm}\\) を使い、\\(b_n=\\frac{2}{L}\\int_0^L T_0\\sin\\frac{n\\pi x}{L}dx=\\frac{2T_0}{n\\pi}[-\\cos\\frac{n\\pi x}{L}]_0^L=\\frac{2T_0}{n\\pi}(1-\\cos n\\pi)\\)。偶数 \\(n\\) では0、奇数 \\(n\\) では \\(4T_0/(n\\pi)\\)。'
+  },
+  {
+    q: '熱拡散の時定数 \\(\\tau_n\\) の正しい式はどれか？',
+    opts: [
+      '\\(\\tau_n = L^2/(\\kappa n^2\\pi^2)\\)',
+      '\\(\\tau_n = \\kappa n^2\\pi^2/L^2\\)',
+      '\\(\\tau_n = L/(\\kappa n\\pi)\\)',
+      '\\(\\tau_n = n\\pi/(\\kappa L^2)\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\(n\\) 番目のモードの時間因子 \\(e^{-\\kappa(n\\pi/L)^2 t}\\) の減衰時定数は \\(\\tau_n=1/[\\kappa(n\\pi/L)^2]=L^2/(\\kappa n^2\\pi^2)\\)。\\(n=1\\) が最も遅く減衰（最長寿命モード）。高次モードほど \\(n^2\\) に反比例して速く消えます。'
+  },
+  {
+    q: 'd\'Alembertの公式 \\(u(x,t)=\\frac{1}{2}[f(x+ct)+f(x-ct)]\\)（初速ゼロの場合）の物理的意味はどれか？',
+    opts: [
+      '初期波形が左右に速さ \\(c\\) で伝播する右行波と左行波に分裂する',
+      '波は減衰しながら伝播する',
+      '波の振幅は時間とともに増大する',
+      '定常波が形成される'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\(f(x+ct)\\) は速さ \\(c\\) で左向きに伝播する波、\\(f(x-ct)\\) は右向きに伝播する波。初期波形が半分ずつに分かれてそれぞれの方向に進みます。変数変換 \\(\\xi=x+ct,\\,\\eta=x-ct\\) で波動方程式が \\(u_{\\xi\\eta}=0\\) に変換されることから導出できます。'
+  },
+  {
+    q: 'Laplace方程式 \\(\\nabla^2\\phi=0\\) の解（調和関数）の特徴として正しいのはどれか？',
+    opts: [
+      '領域内部に極大・極小を持たない（最大値原理）',
+      '時間とともに指数減衰する',
+      '必ず正弦関数の形をとる',
+      '境界条件によらず一意に決まらない'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> 調和関数の最大値原理：「\\(\\nabla^2\\phi=0\\) の解は、境界を除く領域内部では最大値・最小値をとらない」。物理的には静電ポテンシャルや定常温度分布が該当。境界値問題（Dirichlet条件）があれば一意な解が存在します。'
+  },
+  {
+    q: '無限の量子井戸（幅 \\(L\\)）のエネルギー固有値 \\(E_n\\) はどれか？（\\(\\hbar\\) はプランク定数/\\(2\\pi\\)）',
+    opts: [
+      '\\(E_n = \\dfrac{n^2\\pi^2\\hbar^2}{2mL^2}\\)',
+      '\\(E_n = \\dfrac{n\\pi\\hbar}{2mL}\\)',
+      '\\(E_n = \\dfrac{n^2\\hbar^2}{mL^2}\\)',
+      '\\(E_n = \\dfrac{n^2\\hbar^2}{2mL}\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> 定常Schrödinger方程式 \\(-\\frac{\\hbar^2}{2m}\\psi\'\'=E\\psi\\) に境界条件 \\(\\psi(0)=\\psi(L)=0\\) を課すと、波動方程式と同形。固有関数 \\(\\psi_n=\\sin(n\\pi x/L)\\)、固有値 \\(E_n=\\frac{n^2\\pi^2\\hbar^2}{2mL^2}\\)。エネルギーが量子化されます。'
+  },
+  {
+    q: '初期条件 \\(u(x,0)=\\sin(3\\pi x/L)\\)、\\(u_t(x,0)=0\\) の波動方程式の解はどれか？',
+    opts: [
+      '\\(u(x,t)=\\sin(3\\pi x/L)\\cos(3\\pi ct/L)\\)',
+      '\\(u(x,t)=\\sin(3\\pi x/L)e^{-3\\pi ct/L}\\)',
+      '\\(u(x,t)=\\cos(3\\pi x/L)\\sin(3\\pi ct/L)\\)',
+      '\\(u(x,t)=\\sin(3\\pi(x+ct)/L)\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\(f(x)=\\sin(3\\pi x/L)\\) は \\(n=3\\) の固有関数で \\(b_3=1\\)、他の係数はすべて0。時間部分は \\(\\cos(3\\pi ct/L)\\)（初速ゼロなので \\(\\sin\\) 項なし）。結果は定常波で、節（節点）が \\(x=0,L/3,2L/3,L\\) にあります。'
+  },
+  {
+    q: '熱方程式で高次Fourierモードが速く減衰するのはなぜか？',
+    opts: [
+      '空間振動数 \\(n\\pi/L\\) が大きいほど、時定数 \\(\\tau_n\\propto 1/n^2\\) が小さいから',
+      '高次モードは初期振幅が小さいから',
+      '高次モードは境界条件を満たさないから',
+      'Fourier展開の係数が高次ほど大きいから'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> 時定数 \\(\\tau_n=L^2/(\\kappa n^2\\pi^2)\\) は \\(n^2\\) に反比例します。空間的に細かく振動する（\\(n\\) 大）パターンほど、隣接点との温度差が大きいため熱流が速く、素早く均一化されます。これが物理的な直感で、長時間後は \\(n=1\\) の最低次モードのみが残ります。'
+  }
+];
+
+let cur = 0, score = 0, answered = false;
+
+function render() {
+  const q = Q[cur];
+  document.getElementById('bar').style.width = (cur / Q.length * 100) + '%';
+  document.getElementById('prog').textContent = cur + ' / ' + Q.length;
+  const optsHTML = q.opts.map((o, i) =>
+    `<button class="opt" onclick="choose(this,${i===q.ans})" id="opt${i}">${o}</button>`
+  ).join('');
+  document.getElementById('app').innerHTML =
+    `<div class="card">
+      <span class="qnum">問題 ${cur+1} / ${Q.length}</span>
+      <div class="qtext">${q.q}</div>
+      ${optsHTML}
+      <div class="explain" id="explain">📖 ${q.ex}</div>
+      <button class="next-btn" id="nxt" onclick="next()">${cur+1<Q.length?'次の問題 →':'結果を見る'}</button>
+    </div>`;
+  if (window.MathJax) MathJax.typesetPromise();
+  answered = false;
+}
+
+function choose(el, correct) {
+  if (answered) return;
+  answered = true;
+  document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+  if (correct) { el.classList.add('correct'); score++; }
+  else { el.classList.add('wrong'); document.getElementById('opt'+Q[cur].ans).classList.add('correct'); }
+  document.getElementById('explain').classList.add('show');
+  document.getElementById('nxt').classList.add('show');
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+function next() {
+  cur++;
+  if (cur >= Q.length) showResult();
+  else render();
+}
+
+function showResult() {
+  document.getElementById('bar').style.width = '100%';
+  document.getElementById('prog').textContent = Q.length + ' / ' + Q.length;
+  const msg = score===Q.length ? '完璧！演習問題に挑戦しましょう 🎉' :
+              score>=8 ? 'よくできました！' :
+              score>=6 ? '基本は理解できています。苦手を復習しましょう。' :
+              'Introduction のセクション2〜4を読み直してから再挑戦しましょう。';
+  document.getElementById('app').innerHTML =
+    `<div class="result">
+      <h2>クイズ完了</h2>
+      <div class="score">${score}<span> / ${Q.length}</span></div>
+      <p>${msg}</p>
+      <div class="result-btns">
+        <button class="btn-retry" onclick="restart()">もう一度挑戦する</button>
+        <a class="btn-back" href="../level_04.html">Level 4 演習問題を解く →</a>
+        <a class="btn-back" href="index.html">クイズ一覧に戻る</a>
+      </div>
+    </div>`;
+}
+
+function restart() { cur = 0; score = 0; render(); }
+render();
+</script>
+</body>
+</html>

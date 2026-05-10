@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Lv.3 — 線形代数の物理応用</title>
+  <script>MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style']}}</script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;padding:20px 16px;line-height:1.7;min-height:100vh}
+    .header{max-width:520px;margin:0 auto 20px}
+    .title{font-size:1.1rem;color:#f8fafc;font-weight:700;margin-bottom:10px}
+    .prog-bar-wrap{background:#1e293b;border-radius:99px;height:6px;margin-bottom:6px}
+    .prog-bar{background:#6366f1;height:6px;border-radius:99px;transition:width 0.3s}
+    .prog-text{font-size:0.78rem;color:#64748b;text-align:right}
+    .card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;max-width:520px;margin:0 auto}
+    .qnum{display:inline-block;background:#6366f1;color:white;font-size:0.75rem;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:12px}
+    .qtext{color:#f1f5f9;font-size:0.97rem;margin-bottom:18px;line-height:1.8}
+    .opt{display:block;width:100%;text-align:left;background:#0f172a;border:1px solid #334155;color:#e2e8f0;padding:14px 16px;border-radius:8px;margin-bottom:10px;font-size:0.93rem;cursor:pointer;transition:border-color 0.15s,background 0.15s;line-height:1.6}
+    .opt:hover:not(:disabled){border-color:#6366f1;background:#1e293b}
+    .opt.correct{background:#064e3b;border-color:#10b981;color:#6ee7b7}
+    .opt.wrong{background:#450a0a;border-color:#ef4444;color:#fca5a5}
+    .opt:disabled{cursor:default}
+    .explain{display:none;background:#0f172a;border-left:3px solid #6366f1;border-radius:0 8px 8px 0;padding:14px 16px;margin-top:4px;font-size:0.88rem;color:#94a3b8;line-height:1.8}
+    .explain.show{display:block}
+    .explain strong{color:#818cf8}
+    .next-btn{display:none;width:100%;background:#6366f1;color:white;border:none;padding:14px;border-radius:8px;font-size:0.97rem;font-weight:600;cursor:pointer;margin-top:14px}
+    .next-btn.show{display:block}
+    .result{text-align:center;padding:32px 16px;max-width:520px;margin:0 auto}
+    .result h2{font-size:1.4rem;color:#f8fafc;margin-bottom:12px}
+    .score{font-size:3rem;font-weight:700;color:#6366f1;margin:16px 0}
+    .score span{font-size:1.2rem;color:#94a3b8}
+    .result p{color:#94a3b8;margin-bottom:24px}
+    .result-btns{display:flex;gap:10px;flex-direction:column}
+    .btn-retry{background:#6366f1;color:white;border:none;padding:14px;border-radius:8px;font-size:0.97rem;font-weight:600;cursor:pointer}
+    .btn-back{background:#1e293b;color:#94a3b8;border:1px solid #475569;padding:14px;border-radius:8px;font-size:0.97rem;font-weight:600;cursor:pointer;text-decoration:none;display:block;text-align:center}
+    .nav{max-width:520px;margin:16px auto 0;text-align:center}
+    .nav a{color:#64748b;font-size:0.82rem;text-decoration:none}
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="title">Lv.3 線形代数の物理応用</div>
+  <div class="prog-bar-wrap"><div class="prog-bar" id="bar" style="width:0%"></div></div>
+  <div class="prog-text" id="prog">0 / 10</div>
+</div>
+<div id="app"></div>
+<div class="nav"><a href="index.html">← クイズ一覧</a></div>
+
+<script>
+const Q = [
+  {
+    q: '慣性テンソル \\(I_{ij}\\) の対称性として正しいのはどれか？',
+    opts: [
+      '\\(I_{ij}=I_{ji}\\)（対称テンソル）',
+      '\\(I_{ij}=-I_{ji}\\)（反対称テンソル）',
+      '\\(I_{ij}=0\\)（\\(i\\neq j\\)）常に成立',
+      '\\(I_{ij}\\) は一般に複素数'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> 慣性テンソルの定義 \\(I_{ij}=\\int\\rho(r^2\\delta_{ij}-r_i r_j)dV\\) を見ると、\\(\\delta_{ij}\\) も \\(r_i r_j\\) も \\(i\\leftrightarrow j\\) で対称なので \\(I_{ij}=I_{ji}\\)。対称実行列は必ず実固有値を持ち、主軸（固有ベクトル）方向で対角化できます。'
+  },
+  {
+    q: '平行軸定理で、重心周りの慣性モーメント \\(I_G\\) と任意の平行軸周りの \\(I\\) の関係はどれか？',
+    opts: [
+      '\\(I = I_G + Md^2\\)',
+      '\\(I = I_G - Md^2\\)',
+      '\\(I = I_G / (Md^2)\\)',
+      '\\(I_G = I + Md^2\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> 平行軸定理 \\(I=I_G+Md^2\\)（\\(d\\) は重心からの距離、\\(M\\) は総質量）。重心軸周りの慣性モーメントが最小であることも示せます（\\(Md^2\\geq0\\)）。テンソル形では \\(I_{ij}^{(O)}=I_{ij}^{(G)}+M(r_G^2\\delta_{ij}-r_{Gi}r_{Gj})\\)。'
+  },
+  {
+    q: '行列 \\(A=\\begin{pmatrix}0&-\\omega\\\\\\omega&0\\end{pmatrix}\\) について、\\(A^2\\) はどれか？',
+    opts: [
+      '\\(-\\omega^2 I\\)',
+      '\\(\\omega^2 I\\)',
+      '\\(0\\)',
+      '\\(-\\omega^2 A\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> 直接計算：\\(A^2=\\begin{pmatrix}0&-\\omega\\\\\\omega&0\\end{pmatrix}\\begin{pmatrix}0&-\\omega\\\\\\omega&0\\end{pmatrix}=\\begin{pmatrix}-\\omega^2&0\\\\0&-\\omega^2\\end{pmatrix}=-\\omega^2 I\\)。これを利用すると \\(A^4=\\omega^4 I\\)、\\(A^3=-\\omega^2 A\\) となりパターンが見えます。'
+  },
+  {
+    q: '行列指数関数 \\(e^{At}\\) の定義は \\(\\sum_{n=0}^\\infty \\frac{(At)^n}{n!}\\)。\\(A=\\begin{pmatrix}0&-\\omega\\\\\\omega&0\\end{pmatrix}\\) に対して \\(e^{At}\\) はどれか？',
+    opts: [
+      '\\(\\begin{pmatrix}\\cos\\omega t & -\\sin\\omega t\\\\\\sin\\omega t & \\cos\\omega t\\end{pmatrix}\\)',
+      '\\(\\begin{pmatrix}e^{\\omega t} & 0\\\\0 & e^{-\\omega t}\\end{pmatrix}\\)',
+      '\\(\\begin{pmatrix}1 & -\\omega t\\\\\\omega t & 1\\end{pmatrix}\\)',
+      '\\(\\begin{pmatrix}\\cosh\\omega t & -\\sinh\\omega t\\\\\\sinh\\omega t & \\cosh\\omega t\\end{pmatrix}\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\(A^2=-\\omega^2 I\\) を使い偶数・奇数項に分離。偶数項：\\(\\sum\\frac{(-1)^n(\\omega t)^{2n}}{(2n)!}=\\cos\\omega t\\)。奇数項：\\(\\frac{A}{\\omega}\\sum\\frac{(-1)^n(\\omega t)^{2n+1}}{(2n+1)!}=\\frac{A}{\\omega}\\sin\\omega t\\)。合わせると回転行列になります。'
+  },
+  {
+    q: '射影演算子 \\(P\\) の定義的な性質はどれか？',
+    opts: [
+      '\\(P^2 = P\\)（冪等性）',
+      '\\(P^2 = I\\)',
+      '\\(P^T = -P\\)',
+      '\\(\\det P = 1\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> 射影演算子の本質は「二度射影しても結果が変わらない」こと、つまり \\(P^2=P\\)。量子力学では観測量の固有状態への射影演算子 \\(P=|n\\rangle\\langle n|\\) が重要で、スペクトル分解 \\(A=\\sum_n\\lambda_n P_n\\) に使われます。'
+  },
+  {
+    q: 'スペクトル分解（固有分解）\\(A=PDP^{-1}\\) を使うと、行列指数関数は？',
+    opts: [
+      '\\(e^{At}=P\\,e^{Dt}\\,P^{-1}\\)',
+      '\\(e^{At}=P^{-1}e^{Dt}P\\)',
+      '\\(e^{At}=e^{P}\\cdot e^{Dt}\\)',
+      '\\(e^{At}=Pe^{Dt}\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\(A=PDP^{-1}\\) のとき \\(A^n=PD^nP^{-1}\\)。よって \\(e^{At}=\\sum\\frac{(PDP^{-1})^nt^n}{n!}=P\\left(\\sum\\frac{D^nt^n}{n!}\\right)P^{-1}=Pe^{Dt}P^{-1}\\)。\\(D\\) が対角行列なら \\(e^{Dt}\\) は対角成分を指数にするだけ。'
+  },
+  {
+    q: '二次形式 \\(Q=\\mathbf{x}^T A\\mathbf{x}\\)（\\(A\\) は実対称行列）が正定値であるための条件はどれか？',
+    opts: [
+      'すべての固有値が正（\\(\\lambda_i>0\\)）',
+      '\\(\\det A > 0\\)',
+      '\\(\\mathrm{tr}\\,A > 0\\)',
+      '\\(A\\) が対角行列'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> 実対称行列は直交行列で対角化でき \\(Q=\\sum_i\\lambda_i y_i^2\\)（\\(\\mathbf{y}=P^T\\mathbf{x}\\)）。すべての \\(\\lambda_i>0\\) なら任意の \\(\\mathbf{x}\\neq0\\) で \\(Q>0\\)（正定値）。\\(\\det A>0\\) は必要条件ですが十分条件ではありません（例：\\(\\lambda_1>0,\\lambda_2<0\\)でも積が正になる場合あり）。'
+  },
+  {
+    q: '慣性テンソルの固有値は何を意味するか？',
+    opts: [
+      '主慣性モーメント（主軸周りの慣性モーメント）',
+      '物体の質量',
+      '重心の位置座標',
+      '角速度ベクトルの成分'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> 慣性テンソルの固有値 \\(I_1,I_2,I_3\\) を「主慣性モーメント」、対応する固有ベクトル方向を「主軸」と呼びます。主軸座標系では慣性テンソルが対角行列になり、角運動量 \\(L_i=I_i\\omega_i\\) が成分ごとに独立して計算できます。'
+  },
+  {
+    q: '連成振動子の行列形式 \\(m\\ddot{\\mathbf{x}}=-K\\mathbf{x}\\) で、\\(\\mathbf{x}=\\mathbf{a}e^{i\\omega t}\\) を代入すると何の問題になるか？',
+    opts: [
+      '\\(K\\mathbf{a}=m\\omega^2\\mathbf{a}\\)（固有値問題）',
+      '\\(m\\mathbf{a}=K\\omega^2\\mathbf{a}\\)（逆固有値問題）',
+      '\\(K\\mathbf{a}=0\\)（一次方程式）',
+      '\\((K-mI)\\mathbf{a}=\\omega\\mathbf{a}\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> 代入すると \\(-m\\omega^2\\mathbf{a}=-K\\mathbf{a}\\)、すなわち \\(K\\mathbf{a}=m\\omega^2\\mathbf{a}\\)。これは行列 \\(K/m\\) の固有値問題で、固有値 \\(\\omega^2\\) が正規振動数の2乗を与えます。実対称行列なので固有値は実数かつ非負（安定な振動系）。'
+  },
+  {
+    q: '行列 \\(A\\) の固有値が \\(\\lambda_1,\\lambda_2\\) のとき、\\(\\mathrm{tr}\\,A\\) と \\(\\det A\\) の正しい表現はどれか？',
+    opts: [
+      '\\(\\mathrm{tr}\\,A=\\lambda_1+\\lambda_2\\)、\\(\\det A=\\lambda_1\\lambda_2\\)',
+      '\\(\\mathrm{tr}\\,A=\\lambda_1\\lambda_2\\)、\\(\\det A=\\lambda_1+\\lambda_2\\)',
+      '\\(\\mathrm{tr}\\,A=\\lambda_1-\\lambda_2\\)、\\(\\det A=\\lambda_1/\\lambda_2\\)',
+      '\\(\\mathrm{tr}\\,A=\\lambda_1^2+\\lambda_2^2\\)、\\(\\det A=\\lambda_1+\\lambda_2\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> 特性多項式 \\(\\det(\\lambda I-A)=(\\lambda-\\lambda_1)(\\lambda-\\lambda_2)=\\lambda^2-(\\lambda_1+\\lambda_2)\\lambda+\\lambda_1\\lambda_2\\)。係数比較で \\(\\mathrm{tr}\\,A=\\lambda_1+\\lambda_2\\)、\\(\\det A=\\lambda_1\\lambda_2\\)。慣性テンソルの固有値計算でよく使います。'
+  }
+];
+
+let cur = 0, score = 0, answered = false;
+
+function render() {
+  const q = Q[cur];
+  document.getElementById('bar').style.width = (cur / Q.length * 100) + '%';
+  document.getElementById('prog').textContent = cur + ' / ' + Q.length;
+  const optsHTML = q.opts.map((o, i) =>
+    `<button class="opt" onclick="choose(this,${i===q.ans})" id="opt${i}">${o}</button>`
+  ).join('');
+  document.getElementById('app').innerHTML =
+    `<div class="card">
+      <span class="qnum">問題 ${cur+1} / ${Q.length}</span>
+      <div class="qtext">${q.q}</div>
+      ${optsHTML}
+      <div class="explain" id="explain">📖 ${q.ex}</div>
+      <button class="next-btn" id="nxt" onclick="next()">${cur+1<Q.length?'次の問題 →':'結果を見る'}</button>
+    </div>`;
+  if (window.MathJax) MathJax.typesetPromise();
+  answered = false;
+}
+
+function choose(el, correct) {
+  if (answered) return;
+  answered = true;
+  document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+  if (correct) { el.classList.add('correct'); score++; }
+  else { el.classList.add('wrong'); document.getElementById('opt'+Q[cur].ans).classList.add('correct'); }
+  document.getElementById('explain').classList.add('show');
+  document.getElementById('nxt').classList.add('show');
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+function next() {
+  cur++;
+  if (cur >= Q.length) showResult();
+  else render();
+}
+
+function showResult() {
+  document.getElementById('bar').style.width = '100%';
+  document.getElementById('prog').textContent = Q.length + ' / ' + Q.length;
+  const msg = score===Q.length ? '完璧！演習問題に挑戦しましょう 🎉' :
+              score>=8 ? 'よくできました！' :
+              score>=6 ? '基本は理解できています。苦手を復習しましょう。' :
+              'Introduction のセクション3を読み直してから再挑戦しましょう。';
+  document.getElementById('app').innerHTML =
+    `<div class="result">
+      <h2>クイズ完了</h2>
+      <div class="score">${score}<span> / ${Q.length}</span></div>
+      <p>${msg}</p>
+      <div class="result-btns">
+        <button class="btn-retry" onclick="restart()">もう一度挑戦する</button>
+        <a class="btn-back" href="../level_03.html">Level 3 演習問題を解く →</a>
+        <a class="btn-back" href="index.html">クイズ一覧に戻る</a>
+      </div>
+    </div>`;
+}
+
+function restart() { cur = 0; score = 0; render(); }
+render();
+</script>
+</body>
+</html>

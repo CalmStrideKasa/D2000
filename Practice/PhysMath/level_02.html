@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Level 2 — 常微分方程式</title>
+  <script>MathJax={tex:{inlineMath:[['\\(','\\)'],['$','$']],displayMath:[['\\[','\\]'],['$$','$$']],tags:'ams'}};</script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;padding:40px 20px;line-height:1.9}
+    .container{max-width:860px;margin:0 auto}
+    h1{font-size:1.6rem;color:#f8fafc;margin-bottom:4px}
+    .meta{color:#64748b;font-size:.88rem;margin-bottom:40px}
+    .problem{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:24px 28px;margin:28px 0}
+    .problem-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+    .pnum{background:#6366f1;color:white;font-weight:700;font-size:.85rem;padding:3px 12px;border-radius:20px}
+    .ptitle{font-size:1.05rem;color:#f1f5f9;font-weight:600}
+    .context{background:#0f172a;border-left:3px solid #6366f1;padding:10px 16px;margin-bottom:14px;font-size:.88rem;color:#94a3b8;border-radius:0 6px 6px 0}
+    .hint{background:#0f172a;border:1px solid #f59e0b;border-radius:6px;padding:12px 16px;margin-top:14px;font-size:.87rem;color:#fcd34d}
+    .hint strong{color:#fbbf24}
+    p{color:#cbd5e1;margin-bottom:10px}
+    h3{color:#94a3b8;font-size:.95rem;margin:16px 0 6px}
+    .nav{display:flex;justify-content:space-between;margin-top:48px}
+    .btn{padding:10px 20px;border-radius:6px;text-decoration:none;font-size:.88rem;font-weight:600}
+    .btn-back{background:#1e293b;color:#94a3b8;border:1px solid #475569}
+    .btn-ans{background:#6366f1;color:white}
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Level 2 ★★☆☆☆☆☆ — 常微分方程式</h1>
+  <p class="meta">テーマ: 調和振動子・減衰振動・強制振動・連立ODE　|　Introductionのセクション2を参照</p>
+
+  <!-- P1 -->
+  <div class="problem">
+    <div class="problem-header"><span class="pnum">問題 1</span><span class="ptitle">単振り子の線形化と非線形補正</span></div>
+    <div class="context">物理的文脈：振り子の運動方程式 — 量子論・非線形力学の出発点。</div>
+    <p>長さ \(L\)、質量 \(m\) の単振り子の運動方程式は：</p>
+    \[\ddot{\theta} + \frac{g}{L}\sin\theta = 0\]
+    <h3>（1）</h3>
+    <p>\(\theta \ll 1\) の近似（\(\sin\theta \approx \theta\)）で方程式を線形化し、一般解と周期 \(T_0\) を求めよ。</p>
+    <h3>（2）</h3>
+    <p>初期条件 \(\theta(0) = \theta_0,\; \dot{\theta}(0) = 0\) での特殊解を求めよ。</p>
+    <h3>（3）</h3>
+    <p>\(\sin\theta = \theta - \theta^3/6 + \cdots\) の次の近似として \(\theta = \theta_0\cos\omega_0 t + \varepsilon\theta_1(t)\) と展開し（\(\varepsilon = \theta_0^2/6\)）、\(\theta_1\) が満たす方程式を導け。久期項（共鳴項）の除去から補正された周期 \(T = T_0\left(1 + \dfrac{\theta_0^2}{16}\right)\) を示せ。</p>
+    <div class="hint"><strong>ヒント：</strong> \(\cos^3\omega t = \dfrac{3}{4}\cos\omega t + \dfrac{1}{4}\cos 3\omega t\) を利用せよ。</div>
+  </div>
+
+  <!-- P2 -->
+  <div class="problem">
+    <div class="problem-header"><span class="pnum">問題 2</span><span class="ptitle">減衰振動の3つのレジーム</span></div>
+    <div class="context">物理的文脈：機械振動の制振設計・回路のQ値設計。</div>
+    <p>方程式 \(\ddot{x} + 2\gamma\dot{x} + \omega_0^2 x = 0\)（\(\gamma, \omega_0 > 0\)）について答えよ。</p>
+    <h3>（1）過減衰 \(\gamma > \omega_0\)</h3>
+    <p>一般解を求めよ。初期条件 \(x(0)=x_0,\;\dot{x}(0)=0\) での特解を書け。</p>
+    <h3>（2）臨界減衰 \(\gamma = \omega_0\)</h3>
+    <p>一般解を求め、同じ初期条件での特解を示せ。これが過減衰・不足減衰の中で「最も速く平衡に戻る」ことを定性的に議論せよ。</p>
+    <h3>（3）不足減衰 \(\gamma < \omega_0\)</h3>
+    <p>準固有角振動数 \(\omega_1 = \sqrt{\omega_0^2 - \gamma^2}\) を使って一般解を書き、振幅が \(e^{-\gamma t}\) で減衰することを示せ。</p>
+    <h3>（4）</h3>
+    <p>品質因数 \(Q = \omega_0/(2\gamma)\) を定義し、不足減衰で \(Q\) サイクルの間にエネルギーが \(e^{-2\pi}\) 倍になることを示せ（\(Q \gg 1\) の近似で）。</p>
+    <div class="hint"><strong>ヒント：</strong> エネルギー \(E \propto A^2 \propto e^{-2\gamma t}\)。</div>
+  </div>
+
+  <!-- P3 -->
+  <div class="problem">
+    <div class="problem-header"><span class="pnum">問題 3</span><span class="ptitle">強制振動と共鳴</span></div>
+    <div class="context">物理的文脈：LCR回路・地震応答・NMR。</div>
+    <p>方程式 \(\ddot{x} + 2\gamma\dot{x} + \omega_0^2 x = \dfrac{F_0}{m}\cos\omega t\) について答えよ。</p>
+    <h3>（1）</h3>
+    <p>定常特解を \(x_p = A(\omega)\cos(\omega t - \delta)\) の形で求め、振幅 \(A(\omega)\) と位相遅れ \(\delta(\omega)\) を導出せよ：</p>
+    \[A(\omega) = \frac{F_0/m}{\sqrt{(\omega_0^2-\omega^2)^2 + 4\gamma^2\omega^2}}, \qquad \tan\delta = \frac{2\gamma\omega}{\omega_0^2-\omega^2}\]
+    <h3>（2）</h3>
+    <p>\(A(\omega)\) を最大にする駆動角振動数 \(\omega_{\rm res}\) を求めよ。</p>
+    <h3>（3）非減衰共鳴 \(\gamma=0, \omega=\omega_0\)</h3>
+    <p>特解が \(x_p = \dfrac{F_0}{2m\omega_0}t\sin\omega_0 t\) となることを未定係数法で示せ。</p>
+    <div class="hint"><strong>ヒント：</strong> (1) 複素数を使い \(x = \mathrm{Re}[Ce^{i\omega t}]\) として \(C\) を求める方法が計算しやすい。</div>
+  </div>
+
+  <!-- P4 -->
+  <div class="problem">
+    <div class="problem-header"><span class="pnum">問題 4</span><span class="ptitle">連立ODE — 連成振動子の正規モード</span></div>
+    <div class="context">物理的文脈：分子振動・格子振動・結合振動子の基礎。</div>
+    <p>2個の質量 \(m\) が3本のバネ（バネ定数 \(k\)，中央バネは \(\kappa\)）で結ばれた系の運動方程式：</p>
+    \[\begin{cases}m\ddot{x}_1 = -kx_1 - \kappa(x_1-x_2)\\ m\ddot{x}_2 = -kx_2 + \kappa(x_1-x_2)\end{cases}\]
+    <h3>（1）</h3>
+    <p>行列形式 \(m\ddot{\mathbf{x}} = -K\mathbf{x}\) に書き直し、\(K\) を明示せよ。</p>
+    <h3>（2）</h3>
+    <p>\(\mathbf{x} = \mathbf{a}\,e^{i\omega t}\) と仮定して固有値問題 \(K\mathbf{a} = m\omega^2\mathbf{a}\) を解き、2つの正規振動数 \(\omega_\pm\) を求めよ。</p>
+    <h3>（3）</h3>
+    <p>各正規モードの固有ベクトルを求め、それぞれの振動の物理的意味（同相・逆相）を説明せよ。</p>
+    <div class="hint"><strong>ヒント：</strong> \(\omega_- = \sqrt{k/m}\)（重心運動），\(\omega_+ = \sqrt{(k+2\kappa)/m}\)（相対振動）。</div>
+  </div>
+
+  <div class="nav">
+    <a class="btn btn-back" href="index.html">← 一覧</a>
+    <a class="btn btn-ans" href="level_02_answer.html">解答を見る →</a>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Level 2 解答 — 常微分方程式</title>
+  <script>MathJax={tex:{inlineMath:[['\\(','\\)'],['$','$']],displayMath:[['\\[','\\]'],['$$','$$']],tags:'ams'}};</script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;padding:40px 20px;line-height:1.9}
+    .container{max-width:860px;margin:0 auto}
+    h1{font-size:1.6rem;color:#f8fafc;margin-bottom:4px}
+    .meta{color:#64748b;font-size:.88rem;margin-bottom:40px}
+    .sol{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:24px 28px;margin:28px 0}
+    .sol-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+    .pnum{background:#059669;color:white;font-weight:700;font-size:.85rem;padding:3px 12px;border-radius:20px}
+    .ptitle{font-size:1.05rem;color:#f1f5f9;font-weight:600}
+    h3{color:#a5b4fc;font-size:.98rem;margin:20px 0 8px;border-left:3px solid #6366f1;padding-left:10px}
+    p{color:#cbd5e1;margin-bottom:10px}
+    .key{background:#0f172a;border:1px solid #6366f1;border-radius:6px;padding:14px 18px;margin:14px 0}
+    .key strong{color:#818cf8}
+    .nav{display:flex;justify-content:space-between;margin-top:48px}
+    .btn{padding:10px 20px;border-radius:6px;text-decoration:none;font-size:.88rem;font-weight:600}
+    .btn-back{background:#1e293b;color:#94a3b8;border:1px solid #475569}
+    .btn-next{background:#6366f1;color:white}
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Level 2 解答 — 常微分方程式</h1>
+  <p class="meta">★★☆☆☆☆☆</p>
+
+  <!-- Sol 1 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 1</span><span class="ptitle">単振り子の線形化と非線形補正</span></div>
+
+    <h3>（1）線形化</h3>
+    <p>\(\sin\theta\approx\theta\) で \(\ddot{\theta}+\omega_0^2\theta=0\)（\(\omega_0=\sqrt{g/L}\)）。一般解：</p>
+    \[\theta(t) = C_1\cos\omega_0 t + C_2\sin\omega_0 t, \qquad T_0 = \frac{2\pi}{\omega_0} = 2\pi\sqrt{\frac{L}{g}}\]
+
+    <h3>（2）特解（\(\theta(0)=\theta_0,\;\dot\theta(0)=0\)）</h3>
+    \[C_1=\theta_0,\;C_2=0 \quad\Rightarrow\quad \theta(t) = \theta_0\cos\omega_0 t\]
+
+    <h3>（3）非線形補正</h3>
+    <p>\(\theta=\theta_0\cos\omega_0 t + \varepsilon\theta_1\) を代入し、\(\sin\theta\approx\theta-\theta^3/6\)：</p>
+    \[\ddot\theta_1 + \omega_0^2\theta_1 = \frac{\omega_0^2}{6}\theta_0^3\cos^3\omega_0 t = \frac{\omega_0^2\theta_0^3}{6}\cdot\frac{3\cos\omega_0 t+\cos 3\omega_0 t}{4}\]
+    <p>右辺の \(\cos\omega_0 t\) 項は強制共鳴項（久期項）なので係数をゼロにするため \(\omega\) を修正する。正確な計算から：</p>
+    \[\omega = \omega_0\left(1 - \frac{\theta_0^2}{16}\right) \quad\Rightarrow\quad T = T_0\left(1+\frac{\theta_0^2}{16}\right)\]
+    <div class="key"><strong>物理的意味：</strong> 振幅が大きいほど周期が長くなる（非調和性）。\(\theta_0=10°\approx0.175\)rad では約 0.19% の補正。</div>
+  </div>
+
+  <!-- Sol 2 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 2</span><span class="ptitle">減衰振動の3つのレジーム</span></div>
+
+    <h3>（1）過減衰 \(\gamma>\omega_0\)</h3>
+    <p>特性根 \(\lambda_{1,2} = -\gamma \pm \sqrt{\gamma^2-\omega_0^2}\) （両方実数・負）。一般解：</p>
+    \[x(t) = C_1 e^{\lambda_1 t} + C_2 e^{\lambda_2 t}\]
+    <p>初期条件から \(C_1+C_2=x_0,\;C_1\lambda_1+C_2\lambda_2=0\)：</p>
+    \[C_{1,2} = \frac{\mp\lambda_{2,1}}{\lambda_1-\lambda_2}x_0\]
+
+    <h3>（2）臨界減衰 \(\gamma=\omega_0\)</h3>
+    <p>重根 \(\lambda=-\gamma\)。一般解 \(x=(C_1+C_2 t)e^{-\gamma t}\)。初期条件から \(C_1=x_0,\;C_2=\gamma x_0\)：</p>
+    \[x(t) = x_0(1+\gamma t)e^{-\gamma t}\]
+    <p>過減衰では遅い指数成分が長く残り、不足減衰では振動しながら収束する。臨界減衰は振動なしで最速収束。</p>
+
+    <h3>（3）不足減衰 \(\gamma<\omega_0\)</h3>
+    \[x(t) = e^{-\gamma t}(C_1\cos\omega_1 t + C_2\sin\omega_1 t) = A_0 e^{-\gamma t}\cos(\omega_1 t - \phi)\]
+    <p>包絡線 \(A_0 e^{-\gamma t}\) が振幅減衰を表す。</p>
+
+    <h3>（4）品質因数 \(Q\)</h3>
+    <p>\(N\) サイクル後 \((t=N T_1, T_1=2\pi/\omega_1)\)、エネルギー：</p>
+    \[E(N T_1) = E_0 e^{-2\gamma N T_1} \approx E_0 e^{-2\gamma N \cdot 2\pi/\omega_0} = E_0\exp\left(-\frac{2\pi N}{Q}\right)\]
+    <p>\(N=Q\) サイクル後 \(E = E_0 e^{-2\pi}\)。</p>
+    <div class="key"><strong>高Q系</strong>（Q=1000など）はエネルギーを長く保持。原子時計・光共振器・NMRの設計に直結。</div>
+  </div>
+
+  <!-- Sol 3 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 3</span><span class="ptitle">強制振動と共鳴</span></div>
+
+    <h3>（1）複素法による特解</h3>
+    <p>\(\tilde{x}_p = \tilde{C}e^{i\omega t}\) として代入 \((-\omega^2+2i\gamma\omega+\omega_0^2)\tilde{C}=F_0/m\)：</p>
+    \[\tilde{C} = \frac{F_0/m}{(\omega_0^2-\omega^2)+2i\gamma\omega}\]
+    <p>絶対値と位相を分離：</p>
+    \[A(\omega) = |\tilde{C}| = \frac{F_0/m}{\sqrt{(\omega_0^2-\omega^2)^2+4\gamma^2\omega^2}}\]
+    \[\tan\delta = \frac{2\gamma\omega}{\omega_0^2-\omega^2}, \qquad x_p = A(\omega)\cos(\omega t-\delta)\quad\checkmark\]
+
+    <h3>（2）共鳴振動数</h3>
+    <p>\(dA/d\omega=0\) より：</p>
+    \[\omega_{\rm res} = \sqrt{\omega_0^2 - 2\gamma^2}\]
+    <p>（\(\gamma\to 0\) では \(\omega_{\rm res}\to\omega_0\)。）</p>
+
+    <h3>（3）非減衰共鳴</h3>
+    <p>\(\gamma=0,\;\omega=\omega_0\) では特性方程式の根と駆動周波数が一致するため通常法が使えない。特解として \(x_p=t(A\cos\omega_0 t+B\sin\omega_0 t)\) を仮定し代入：</p>
+    \[(-2A\omega_0\sin\omega_0 t + 2B\omega_0\cos\omega_0 t) = \frac{F_0}{m}\cos\omega_0 t\]
+    \[\therefore B=\frac{F_0}{2m\omega_0},\;A=0 \quad\Rightarrow\quad x_p = \frac{F_0}{2m\omega_0}t\sin\omega_0 t\quad\checkmark\]
+    <div class="key"><strong>物理的意味：</strong> 振幅が \(t\) に比例して増大 → 構造物の共鳴破壊（Tacoma橋崩壊など）の数学的根拠。</div>
+  </div>
+
+  <!-- Sol 4 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 4</span><span class="ptitle">連立ODE — 連成振動子の正規モード</span></div>
+
+    <h3>（1）行列形式</h3>
+    \[K = \begin{pmatrix}k+\kappa & -\kappa \\ -\kappa & k+\kappa\end{pmatrix}\]
+
+    <h3>（2）固有値問題</h3>
+    \[\det(K - m\omega^2 I) = (k+\kappa-m\omega^2)^2 - \kappa^2 = 0\]
+    \[m\omega^2 = (k+\kappa)\pm\kappa\]
+    \[\omega_- = \sqrt{\frac{k}{m}}, \qquad \omega_+ = \sqrt{\frac{k+2\kappa}{m}}\]
+
+    <h3>（3）固有モード</h3>
+    <p>\(\omega_-\)：\(K\mathbf{a} = k\mathbf{a}\) より \(\mathbf{a}_- = \dfrac{1}{\sqrt{2}}(1,1)^T\) ← <strong>同相モード</strong>（2質点が同方向に動く、中央バネ伸縮なし）</p>
+    <p>\(\omega_+\)：\(\mathbf{a}_+ = \dfrac{1}{\sqrt{2}}(1,-1)^T\) ← <strong>逆相モード</strong>（2質点が逆方向、中央バネが最大伸縮）</p>
+    <div class="key"><strong>正規座標：</strong> \(q_1=(x_1+x_2)/\sqrt{2},\;q_2=(x_1-x_2)/\sqrt{2}\) とすると方程式が完全に分離し、各 \(q_i\) が独立な調和振動子になる。これが「正規モード」の意味。</div>
+  </div>
+
+  <div class="nav">
+    <a class="btn btn-back" href="level_02.html">← 問題に戻る</a>
+    <a class="btn btn-next" href="level_03.html">Level 3 →</a>
+  </div>
+</div>
+</body>
+</html>

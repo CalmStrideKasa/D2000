@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Lv.6 — フーリエ解析・変分法</title>
+  <script>MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style']}}</script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;padding:20px 16px;line-height:1.7;min-height:100vh}
+    .header{max-width:520px;margin:0 auto 20px}
+    .title{font-size:1.1rem;color:#f8fafc;font-weight:700;margin-bottom:10px}
+    .prog-bar-wrap{background:#1e293b;border-radius:99px;height:6px;margin-bottom:6px}
+    .prog-bar{background:#6366f1;height:6px;border-radius:99px;transition:width 0.3s}
+    .prog-text{font-size:0.78rem;color:#64748b;text-align:right}
+    .card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;max-width:520px;margin:0 auto}
+    .qnum{display:inline-block;background:#6366f1;color:white;font-size:0.75rem;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:12px}
+    .qtext{color:#f1f5f9;font-size:0.97rem;margin-bottom:18px;line-height:1.8}
+    .opt{display:block;width:100%;text-align:left;background:#0f172a;border:1px solid #334155;color:#e2e8f0;padding:14px 16px;border-radius:8px;margin-bottom:10px;font-size:0.93rem;cursor:pointer;transition:border-color 0.15s,background 0.15s;line-height:1.6}
+    .opt:hover:not(:disabled){border-color:#6366f1;background:#1e293b}
+    .opt.correct{background:#064e3b;border-color:#10b981;color:#6ee7b7}
+    .opt.wrong{background:#450a0a;border-color:#ef4444;color:#fca5a5}
+    .opt:disabled{cursor:default}
+    .explain{display:none;background:#0f172a;border-left:3px solid #6366f1;border-radius:0 8px 8px 0;padding:14px 16px;margin-top:4px;font-size:0.88rem;color:#94a3b8;line-height:1.8}
+    .explain.show{display:block}
+    .explain strong{color:#818cf8}
+    .next-btn{display:none;width:100%;background:#6366f1;color:white;border:none;padding:14px;border-radius:8px;font-size:0.97rem;font-weight:600;cursor:pointer;margin-top:14px}
+    .next-btn.show{display:block}
+    .result{text-align:center;padding:32px 16px;max-width:520px;margin:0 auto}
+    .result h2{font-size:1.4rem;color:#f8fafc;margin-bottom:12px}
+    .score{font-size:3rem;font-weight:700;color:#6366f1;margin:16px 0}
+    .score span{font-size:1.2rem;color:#94a3b8}
+    .result p{color:#94a3b8;margin-bottom:24px}
+    .result-btns{display:flex;gap:10px;flex-direction:column}
+    .btn-retry{background:#6366f1;color:white;border:none;padding:14px;border-radius:8px;font-size:0.97rem;font-weight:600;cursor:pointer}
+    .btn-back{background:#1e293b;color:#94a3b8;border:1px solid #475569;padding:14px;border-radius:8px;font-size:0.97rem;font-weight:600;cursor:pointer;text-decoration:none;display:block;text-align:center}
+    .nav{max-width:520px;margin:16px auto 0;text-align:center}
+    .nav a{color:#64748b;font-size:0.82rem;text-decoration:none}
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="title">Lv.6 フーリエ解析・変分法</div>
+  <div class="prog-bar-wrap"><div class="prog-bar" id="bar" style="width:0%"></div></div>
+  <div class="prog-text" id="prog">0 / 10</div>
+</div>
+<div id="app"></div>
+<div class="nav"><a href="index.html">← クイズ一覧</a></div>
+
+<script>
+const Q = [
+  {
+    q: 'フーリエ変換 \\(\\tilde{f}(\\omega)=\\int_{-\\infty}^\\infty f(t)e^{-i\\omega t}dt\\) の逆変換として正しいのはどれか？',
+    opts: [
+      '\\(f(t)=\\dfrac{1}{2\\pi}\\int_{-\\infty}^\\infty\\tilde{f}(\\omega)e^{i\\omega t}d\\omega\\)',
+      '\\(f(t)=\\int_{-\\infty}^\\infty\\tilde{f}(\\omega)e^{i\\omega t}d\\omega\\)',
+      '\\(f(t)=\\dfrac{1}{2\\pi}\\int_{-\\infty}^\\infty\\tilde{f}(\\omega)e^{-i\\omega t}d\\omega\\)',
+      '\\(f(t)=\\dfrac{1}{\\pi}\\int_0^\\infty\\tilde{f}(\\omega)\\cos(\\omega t)d\\omega\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> 変換対に対して係数 \\(1/(2\\pi)\\) がどこに付くかは慣習によりますが、物理では \\(\\tilde{f}(\\omega)=\\int f(t)e^{-i\\omega t}dt\\)、\\(f(t)=\\frac{1}{2\\pi}\\int\\tilde{f}(\\omega)e^{i\\omega t}d\\omega\\) が標準的。\\(\\delta\\)関数の表現 \\(\\delta(t)=\\frac{1}{2\\pi}\\int e^{i\\omega t}d\\omega\\) と整合しています。'
+  },
+  {
+    q: 'Parsevalの定理として正しいのはどれか？',
+    opts: [
+      '\\(\\int_{-\\infty}^\\infty|f(t)|^2dt=\\dfrac{1}{2\\pi}\\int_{-\\infty}^\\infty|\\tilde{f}(\\omega)|^2d\\omega\\)',
+      '\\(\\int_{-\\infty}^\\infty|f(t)|^2dt=\\int_{-\\infty}^\\infty|\\tilde{f}(\\omega)|^2d\\omega\\)',
+      '\\(\\int f(t)g(t)dt=\\tilde{f}(\\omega)\\tilde{g}(\\omega)\\)',
+      '\\(|\\tilde{f}(\\omega)|^2=|f(t)|^2\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> Parsevalの定理は「信号のエネルギーは時間域と周波数域で等しい」ことを述べます。\\(1/(2\\pi)\\) の係数は変換の規格化から来ます。物理的には、フーリエ変換は等長変換（ユニタリ変換）であることを意味し、エネルギー保存に対応します。'
+  },
+  {
+    q: '畳み込み \\((f*g)(t)=\\int_{-\\infty}^\\infty f(\\tau)g(t-\\tau)d\\tau\\) のフーリエ変換はどれか？',
+    opts: [
+      '\\(\\widetilde{f*g}(\\omega)=\\tilde{f}(\\omega)\\cdot\\tilde{g}(\\omega)\\)',
+      '\\(\\widetilde{f*g}(\\omega)=\\tilde{f}(\\omega)+\\tilde{g}(\\omega)\\)',
+      '\\(\\widetilde{f*g}(\\omega)=\\tilde{f}(\\omega)/\\tilde{g}(\\omega)\\)',
+      '\\(\\widetilde{f*g}(\\omega)=2\\pi\\tilde{f}(\\omega)\\tilde{g}(\\omega)\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> 畳み込み定理：「時間域の畳み込み ↔ 周波数域の積」。これはLTIシステムの解析で非常に重要で、インパルス応答 \\(h(t)\\) を持つシステムの出力は \\((h*x)(t)\\) で、周波数域では \\(H(\\omega)X(\\omega)\\)（転送関数 × 入力）と書けます。'
+  },
+  {
+    q: '汎関数 \\(J[y]=\\int_a^b L(x,y,y\')dx\\) の変分 \\(\\delta J=0\\) から導かれる Euler-Lagrange 方程式はどれか？',
+    opts: [
+      '\\(\\dfrac{\\partial L}{\\partial y}-\\dfrac{d}{dx}\\dfrac{\\partial L}{\\partial y\'}=0\\)',
+      '\\(\\dfrac{\\partial L}{\\partial y}+\\dfrac{d}{dx}\\dfrac{\\partial L}{\\partial y\'}=0\\)',
+      '\\(\\dfrac{d^2L}{dx^2}=0\\)',
+      '\\(L - y\'\\dfrac{\\partial L}{\\partial y\'}=\\text{const}\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\(\\delta J=\\int(\\frac{\\partial L}{\\partial y}\\delta y+\\frac{\\partial L}{\\partial y\'}\\delta y\')dx=0\\)。部分積分で \\(\\delta y\'\\) の項を処理すると \\(\\int(\\frac{\\partial L}{\\partial y}-\\frac{d}{dx}\\frac{\\partial L}{\\partial y\'})\\delta y\\,dx=0\\)。\\(\\delta y\\) が任意なのでEL方程式が得られます。'
+  },
+  {
+    q: '力学のLagrangian \\(L=T-V\\)（\\(T\\): 運動エネルギー、\\(V\\): ポテンシャル）からEuler-Lagrange方程式を使うと何が得られるか？',
+    opts: [
+      'Newton の運動方程式 \\(m\\ddot{q}=-\\partial V/\\partial q\\)',
+      'エネルギー保存則 \\(T+V=\\text{const}\\)',
+      'Hamiltonの方程式',
+      '最小作用の原理の変分'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\(L=\\frac{1}{2}m\\dot{q}^2-V(q)\\) に対して \\(\\frac{\\partial L}{\\partial q}=-\\frac{\\partial V}{\\partial q}\\)、\\(\\frac{\\partial L}{\\partial\\dot{q}}=m\\dot{q}\\)。EL方程式: \\(-\\frac{\\partial V}{\\partial q}-m\\ddot{q}=0\\)、すなわち \\(m\\ddot{q}=-\\frac{\\partial V}{\\partial q}\\)（Newton 第二法則）。'
+  },
+  {
+    q: 'ブラキストクロン問題（最速降下曲線）を変分法で解くと、その解はどれか？',
+    opts: [
+      'サイクロイド曲線',
+      '放物線',
+      '直線',
+      '楕円'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> 時間汎関数 \\(T=\\int\\sqrt{(1+y\'^2)/(2gy)}\\,dx\\) をEL方程式で解くと、サイクロイド \\(x=r(\\theta-\\sin\\theta)\\)、\\(y=r(1-\\cos\\theta)\\) が得られます。Fermatの原理（光の最短時間経路）も同形の変分問題です。'
+  },
+  {
+    q: 'Noetherの定理の内容として正しいのはどれか？',
+    opts: [
+      'ラグランジアンの連続対称性には対応する保存量が存在する',
+      '運動方程式が線形ならば重ね合わせ原理が成り立つ',
+      '正準変換はハミルトン方程式を不変に保つ',
+      'エネルギーと運動量は同時確定できない'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> Noetherの定理：時間並進対称性 → エネルギー保存、空間並進対称性 → 運動量保存、回転対称性 → 角運動量保存。「対称性 → 保存則」の対応は現代物理の根幹で、標準模型のゲージ対称性も同じ原理から素粒子の相互作用を導きます。'
+  },
+  {
+    q: 'Hamilton \\(H\\) と Lagrangian \\(L\\) の関係式（Legendre変換）はどれか？',
+    opts: [
+      '\\(H=p\\dot{q}-L\\)（\\(p=\\partial L/\\partial\\dot{q}\\)）',
+      '\\(H=L+p\\dot{q}\\)',
+      '\\(H=-L\\)',
+      '\\(H=\\partial L/\\partial t\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\(p=\\partial L/\\partial\\dot{q}\\) を一般化運動量として、Legendre変換 \\(H(q,p,t)=p\\dot{q}-L(q,\\dot{q},t)\\) でハミルトニアンを定義。\\(H\\) は多くの場合 \\(T+V\\)（全エネルギー）に等しく、Hamiltonの正準方程式 \\(\\dot{q}=\\partial H/\\partial p\\)、\\(\\dot{p}=-\\partial H/\\partial q\\) を与えます。'
+  },
+  {
+    q: 'Poissonブラケット \\(\\{A,B\\}\\) の定義はどれか？',
+    opts: [
+      '\\(\\{A,B\\}=\\dfrac{\\partial A}{\\partial q}\\dfrac{\\partial B}{\\partial p}-\\dfrac{\\partial A}{\\partial p}\\dfrac{\\partial B}{\\partial q}\\)',
+      '\\(\\{A,B\\}=\\dfrac{\\partial A}{\\partial q}\\dfrac{\\partial B}{\\partial q}+\\dfrac{\\partial A}{\\partial p}\\dfrac{\\partial B}{\\partial p}\\)',
+      '\\(\\{A,B\\}=AB-BA\\)',
+      '\\(\\{A,B\\}=\\dfrac{\\partial^2(AB)}{\\partial q\\partial p}\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> Poissonブラケットは古典力学における交換子の類似物。時間発展は \\(\\dot{A}=\\{A,H\\}+\\partial A/\\partial t\\)。\\(\\{q_i,p_j\\}=\\delta_{ij}\\) が基本関係。量子力学への移行では \\(\\{A,B\\}\\to \\frac{1}{i\\hbar}[\\hat{A},\\hat{B}]\\)（Diracの量子化）。'
+  },
+  {
+    q: 'グリーン関数 \\(G(x,x\')\\) の定義はどれか？（\\(\\mathcal{L}\\) は線形微分演算子）',
+    opts: [
+      '\\(\\mathcal{L}G(x,x\')=\\delta(x-x\')\\)',
+      '\\(\\mathcal{L}G(x,x\')=0\\)',
+      '\\(G(x,x\')=\\int f(x\')dx\'\\)',
+      '\\(\\mathcal{L}G(x,x\')=1\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> グリーン関数はデルタ関数を「右辺」とする方程式の解。これが分かれば任意の外力 \\(f(x\')\\) に対する解が \\(y(x)=\\int G(x,x\')f(x\')dx\'\\) で書けます。強制振動問題では \\(G(t,t\')\\) がインパルス応答関数（Heaviside 関数を含む）になります。'
+  }
+];
+
+let cur = 0, score = 0, answered = false;
+
+function render() {
+  const q = Q[cur];
+  document.getElementById('bar').style.width = (cur / Q.length * 100) + '%';
+  document.getElementById('prog').textContent = cur + ' / ' + Q.length;
+  const optsHTML = q.opts.map((o, i) =>
+    `<button class="opt" onclick="choose(this,${i===q.ans})" id="opt${i}">${o}</button>`
+  ).join('');
+  document.getElementById('app').innerHTML =
+    `<div class="card">
+      <span class="qnum">問題 ${cur+1} / ${Q.length}</span>
+      <div class="qtext">${q.q}</div>
+      ${optsHTML}
+      <div class="explain" id="explain">📖 ${q.ex}</div>
+      <button class="next-btn" id="nxt" onclick="next()">${cur+1<Q.length?'次の問題 →':'結果を見る'}</button>
+    </div>`;
+  if (window.MathJax) MathJax.typesetPromise();
+  answered = false;
+}
+
+function choose(el, correct) {
+  if (answered) return;
+  answered = true;
+  document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+  if (correct) { el.classList.add('correct'); score++; }
+  else { el.classList.add('wrong'); document.getElementById('opt'+Q[cur].ans).classList.add('correct'); }
+  document.getElementById('explain').classList.add('show');
+  document.getElementById('nxt').classList.add('show');
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+function next() {
+  cur++;
+  if (cur >= Q.length) showResult();
+  else render();
+}
+
+function showResult() {
+  document.getElementById('bar').style.width = '100%';
+  document.getElementById('prog').textContent = Q.length + ' / ' + Q.length;
+  const msg = score===Q.length ? '完璧！演習問題に挑戦しましょう 🎉' :
+              score>=8 ? 'よくできました！' :
+              score>=6 ? '基本は理解できています。苦手を復習しましょう。' :
+              'Introduction のセクション4〜5を読み直してから再挑戦しましょう。';
+  document.getElementById('app').innerHTML =
+    `<div class="result">
+      <h2>クイズ完了</h2>
+      <div class="score">${score}<span> / ${Q.length}</span></div>
+      <p>${msg}</p>
+      <div class="result-btns">
+        <button class="btn-retry" onclick="restart()">もう一度挑戦する</button>
+        <a class="btn-back" href="../level_06.html">Level 6 演習問題を解く →</a>
+        <a class="btn-back" href="index.html">クイズ一覧に戻る</a>
+      </div>
+    </div>`;
+}
+
+function restart() { cur = 0; score = 0; render(); }
+render();
+</script>
+</body>
+</html>

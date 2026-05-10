@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Level 5 解答 — テンソル解析</title>
+  <script>MathJax={tex:{inlineMath:[['\\(','\\)'],['$','$']],displayMath:[['\\[','\\]'],['$$','$$']],tags:'ams'}};</script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;padding:40px 20px;line-height:1.9}.container{max-width:860px;margin:0 auto}h1{font-size:1.6rem;color:#f8fafc;margin-bottom:4px}.meta{color:#64748b;font-size:.88rem;margin-bottom:40px}.sol{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:24px 28px;margin:28px 0}.sol-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}.pnum{background:#059669;color:white;font-weight:700;font-size:.85rem;padding:3px 12px;border-radius:20px}.ptitle{font-size:1.05rem;color:#f1f5f9;font-weight:600}h3{color:#a5b4fc;font-size:.98rem;margin:20px 0 8px;border-left:3px solid #6366f1;padding-left:10px}p{color:#cbd5e1;margin-bottom:10px}.key{background:#0f172a;border:1px solid #6366f1;border-radius:6px;padding:14px 18px;margin:14px 0}.key strong{color:#818cf8}.nav{display:flex;justify-content:space-between;margin-top:48px}.btn{padding:10px 20px;border-radius:6px;text-decoration:none;font-size:.88rem;font-weight:600}.btn-back{background:#1e293b;color:#94a3b8;border:1px solid #475569}.btn-next{background:#6366f1;color:white}</style>
+</head>
+<body>
+<div class="container">
+  <h1>Level 5 解答 — テンソル解析</h1>
+  <p class="meta">★★★★★☆☆</p>
+
+  <!-- Sol 1 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 1</span><span class="ptitle">Levi-Civitaシンボルとベクトル恒等式</span></div>
+
+    <h3>（1）BAC-CAB則</h3>
+    \begin{align}
+    [(\mathbf{A}\times\mathbf{B})\times\mathbf{C}]^i &= \varepsilon^{ijk}(\varepsilon_{jlm}A^l B^m)C_k = \varepsilon^{ijk}\varepsilon_{jlm}A^l B^m C_k \\
+    &= -\varepsilon^{ijk}\varepsilon_{ljm}A^l B^m C_k = -(\delta^i_l\delta^k_m - \delta^i_m\delta^k_l)A^l B^m C_k \\
+    &= -A^i B^m C_m + B^i A^l C_l = B^i(\mathbf{A}\cdot\mathbf{C}) - A^i(\mathbf{B}\cdot\mathbf{C})\quad\checkmark
+    \end{align}
+
+    <h3>（2）\(\nabla\times(\nabla\times\mathbf{F})\)</h3>
+    \[[\nabla\times(\nabla\times\mathbf{F})]^i = \varepsilon^{ijk}\partial_j(\varepsilon_{klm}\partial_l F_m) = \varepsilon^{ijk}\varepsilon_{klm}\partial_j\partial_l F_m\]
+    \[= (\delta^i_l\delta^j_m - \delta^i_m\delta^j_l)\partial_j\partial_l F_m = \partial_l\partial^i F^l - \partial_j\partial^j F^i = \nabla^i(\nabla\cdot\mathbf{F}) - \nabla^2 F^i\quad\checkmark\]
+
+    <h3>（3）電磁波の波動方程式</h3>
+    \[\nabla\times(\nabla\times\mathbf{E}) = \nabla(\underbrace{\nabla\cdot\mathbf{E}}_{=0}) - \nabla^2\mathbf{E} = -\nabla^2\mathbf{E}\]
+    <p>Faradayの法則 \(\nabla\times\mathbf{E}=-\partial\mathbf{B}/\partial t\)、Ampereの法則 \(\nabla\times\mathbf{B}=\mu_0\varepsilon_0\partial\mathbf{E}/\partial t\) を使うと：</p>
+    \[-\nabla^2\mathbf{E} = -\frac{\partial}{\partial t}(\nabla\times\mathbf{B}) = -\mu_0\varepsilon_0\frac{\partial^2\mathbf{E}}{\partial t^2} \;\Rightarrow\; \nabla^2\mathbf{E} = \mu_0\varepsilon_0\frac{\partial^2\mathbf{E}}{\partial t^2}\quad\checkmark\]
+    <div class="key">光速 \(c=1/\sqrt{\mu_0\varepsilon_0}\) が導出される。Maxwell方程式の最大の成果のひとつ。</div>
+  </div>
+
+  <!-- Sol 2 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 2</span><span class="ptitle">電磁場テンソルとLorentz変換</span></div>
+
+    <h3>（1）\(F^{\mu\nu}\) の成分</h3>
+    <p>\(A^\mu=(\phi/c, A_x, A_y, A_z)\)、\(\partial^\mu = (-\partial_t/c, \nabla)\) を使い \(F^{01}=\partial^0 A^1-\partial^1 A^0\)：</p>
+    \[F^{01} = -\frac{1}{c}\frac{\partial A_x}{\partial t} - \frac{\partial}{\partial x}\frac{\phi}{c} = -\frac{E_x}{c}\quad\checkmark\]
+    <p>磁場成分：\(F^{12} = \partial^1 A^2 - \partial^2 A^1 = \partial_x A_y - \partial_y A_x = -B_z\quad\checkmark\)</p>
+
+    <h3>（2）Lorentz力の再現</h3>
+    <p>\(u^\nu \approx (c, v_x, v_y, v_z)\)（\(v\ll c\)）として空間成分 \(f^i = q F^{i\nu}u_\nu\)：</p>
+    \[f^1 = q(F^{10}u_0 + F^{12}u_2 + F^{13}u_3) = q\left(\frac{E_x}{c}\cdot c + (-B_z)v_y + B_y v_z\right) = q(E_x + v_y B_z - v_z B_y)\]
+    <p>これは \([\mathbf{v}\times\mathbf{B}]_x = v_y B_z - v_z B_y\) を含むので \(\mathbf{f}=q(\mathbf{E}+\mathbf{v}\times\mathbf{B})\) ✓</p>
+
+    <h3>（3）Lorentz変換による場の変換</h3>
+    <p>\(x\) 方向ブーストで \(F'^{01}=\Lambda^0{}_\alpha\Lambda^1{}_\beta F^{\alpha\beta}\) を計算すると：</p>
+    \[E'_x = E_x,\quad E'_y = \gamma(E_y - \beta c B_z),\quad E'_z = \gamma(E_z + \beta c B_y)\]
+    \[B'_x = B_x,\quad B'_y = \gamma\!\left(B_y + \frac{\beta}{c}E_z\right),\quad B'_z = \gamma\!\left(B_z - \frac{\beta}{c}E_y\right)\]
+    <div class="key"><strong>洞察：</strong> 電場と磁場は別々の「物理量」ではなく、同一の電磁場テンソルの、座標系依存の表れに過ぎない。</div>
+  </div>
+
+  <!-- Sol 3 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 3</span><span class="ptitle">球面座標のChristoffel記号と測地線</span></div>
+
+    <h3>（1）非零Christoffel記号</h3>
+    \[\Gamma^r_{\theta\theta}=-r,\quad\Gamma^r_{\varphi\varphi}=-r\sin^2\theta\]
+    \[\Gamma^\theta_{r\theta}=\Gamma^\theta_{\theta r}=\frac{1}{r},\quad\Gamma^\theta_{\varphi\varphi}=-\sin\theta\cos\theta\]
+    \[\Gamma^\varphi_{r\varphi}=\Gamma^\varphi_{\varphi r}=\frac{1}{r},\quad\Gamma^\varphi_{\theta\varphi}=\Gamma^\varphi_{\varphi\theta}=\cot\theta\]
+
+    <h3>（2）球面上の測地線（\(r=\mathrm{const}\)）</h3>
+    <p>\(\dot r=\ddot r=0\) として \(\theta,\varphi\) の方程式：</p>
+    \[\ddot\theta - \sin\theta\cos\theta\,\dot\varphi^2 = 0\]
+    \[\ddot\varphi + 2\cot\theta\,\dot\theta\dot\varphi = 0\]
+    <p>解は大円（赤道面の回転）。</p>
+
+    <h3>（3）加速度の \(\theta\) 成分</h3>
+    \[a^\theta = \ddot\theta + 2\cdot\frac{1}{r}\dot r\dot\theta - \sin\theta\cos\theta\,(\dot\varphi)^2\]
+    <p>（球面極座標での加速度公式に一致）</p>
+    <div class="key"><strong>測地線方程式</strong>は「慣性系での直線運動」の曲線座標版。一般相対論では重力のない時空での自由落下軌道を記述する。</div>
+  </div>
+
+  <!-- Sol 4 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 4</span><span class="ptitle">応力テンソルと主応力</span></div>
+
+    <h3>（1）トラクションベクトル</h3>
+    \[\mathbf{t} = \sigma\cdot\hat{n} = \frac{1}{\sqrt{2}}\begin{pmatrix}10+5\\5+3\\0+2\end{pmatrix} = \frac{1}{\sqrt{2}}\begin{pmatrix}15\\8\\2\end{pmatrix}\;\text{[MPa]}\]
+
+    <h3>（2）法線・せん断応力</h3>
+    \[\sigma_n = \mathbf{t}\cdot\hat{n} = \frac{1}{\sqrt{2}}(15,8,2)\cdot\frac{1}{\sqrt{2}}(1,1,0) = \frac{15+8}{2} = 11.5\;\text{MPa}\]
+    \[|\boldsymbol{\tau}| = \sqrt{|\mathbf{t}|^2 - \sigma_n^2} = \sqrt{\frac{15^2+8^2+2^2}{2}-11.5^2} = \sqrt{\frac{293}{2}-132.25} = \sqrt{14.25}\approx 3.78\;\text{MPa}\]
+
+    <h3>（3）主応力</h3>
+    <p>上左 \(2\times2\) ブロックの固有値：\(\det\begin{pmatrix}10-\lambda&5\\5&3-\lambda\end{pmatrix}=\lambda^2-13\lambda+5=0\)</p>
+    \[\lambda = \frac{13\pm\sqrt{169-20}}{2} = \frac{13\pm\sqrt{149}}{2}\]
+    \[\lambda_1 \approx 12.60\;\text{MPa},\quad\lambda_2 \approx 0.40\;\text{MPa},\quad\lambda_3 = -1\;\text{MPa}\]
+
+    <h3>（4）最大せん断応力</h3>
+    \[\tau_{\max} = \frac{\lambda_1-\lambda_3}{2} = \frac{12.60-(-1)}{2} \approx 6.80\;\text{MPa}\]
+    <div class="key"><strong>Mohr円：</strong> 主応力の最大・最小値と最大せん断応力は材料の降伏・破壊条件（Von Misesの降伏基準など）の設計に使われる。</div>
+  </div>
+
+  <div class="nav">
+    <a class="btn btn-back" href="level_05.html">← 問題に戻る</a>
+    <a class="btn btn-next" href="level_06.html">Level 6 →</a>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Level 4 — 偏微分方程式</title>
+  <script>MathJax={tex:{inlineMath:[['\\(','\\)'],['$','$']],displayMath:[['\\[','\\]'],['$$','$$']],tags:'ams'}};</script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;padding:40px 20px;line-height:1.9}.container{max-width:860px;margin:0 auto}h1{font-size:1.6rem;color:#f8fafc;margin-bottom:4px}.meta{color:#64748b;font-size:.88rem;margin-bottom:40px}.problem{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:24px 28px;margin:28px 0}.problem-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}.pnum{background:#6366f1;color:white;font-weight:700;font-size:.85rem;padding:3px 12px;border-radius:20px}.ptitle{font-size:1.05rem;color:#f1f5f9;font-weight:600}.context{background:#0f172a;border-left:3px solid #6366f1;padding:10px 16px;margin-bottom:14px;font-size:.88rem;color:#94a3b8;border-radius:0 6px 6px 0}.hint{background:#0f172a;border:1px solid #f59e0b;border-radius:6px;padding:12px 16px;margin-top:14px;font-size:.87rem;color:#fcd34d}.hint strong{color:#fbbf24}p{color:#cbd5e1;margin-bottom:10px}h3{color:#94a3b8;font-size:.95rem;margin:16px 0 6px}.nav{display:flex;justify-content:space-between;margin-top:48px}.btn{padding:10px 20px;border-radius:6px;text-decoration:none;font-size:.88rem;font-weight:600}.btn-back{background:#1e293b;color:#94a3b8;border:1px solid #475569}.btn-ans{background:#6366f1;color:white}</style>
+</head>
+<body>
+<div class="container">
+  <h1>Level 4 ★★★★☆☆☆ — 偏微分方程式</h1>
+  <p class="meta">テーマ: 変数分離法・固有関数展開・Fourier解析との接続</p>
+
+  <!-- P1 -->
+  <div class="problem">
+    <div class="problem-header"><span class="pnum">問題 1</span><span class="ptitle">波動方程式と固有モード展開</span></div>
+    <div class="context">物理的文脈：弦の横振動・光学共振器・量子井戸の時間依存問題。</div>
+    <p>境界値問題：</p>
+    \[\frac{\partial^2 u}{\partial t^2} = c^2\frac{\partial^2 u}{\partial x^2},\quad 0<x<L,\;t>0\]
+    \[u(0,t)=u(L,t)=0,\quad u(x,0)=f(x),\quad \frac{\partial u}{\partial t}\bigg|_{t=0}=g(x)\]
+    <h3>（1）</h3>
+    <p>変数分離 \(u=X(x)T(t)\) を仮定し、\(X''/X = T''/(c^2T) = -\lambda\) と分離定数を置いて、境界条件から固有値・固有関数を求めよ。</p>
+    <h3>（2）</h3>
+    <p>一般解を固有関数展開で表せ。</p>
+    <h3>（3）</h3>
+    <p>特に \(f(x)=\sin(3\pi x/L),\;g(x)=0\) の場合の特殊解を求め、物理的に解釈せよ。</p>
+    <h3>（4）</h3>
+    <p>d'Alembertの方法で無限弦 \((-\infty<x<\infty)\) の解 \(u(x,t)=\dfrac{1}{2}[f(x+ct)+f(x-ct)]+\dfrac{1}{2c}\displaystyle\int_{x-ct}^{x+ct}g(s)ds\) を導け。</p>
+    <div class="hint"><strong>ヒント：</strong> (4) \(\xi=x+ct,\;\eta=x-ct\) と変数変換すると波動方程式は \(\partial^2 u/\partial\xi\partial\eta=0\) になる。</div>
+  </div>
+
+  <!-- P2 -->
+  <div class="problem">
+    <div class="problem-header"><span class="pnum">問題 2</span><span class="ptitle">熱伝導方程式と拡散</span></div>
+    <div class="context">物理的文脈：熱拡散・粒子拡散・確率過程（Brown運動）。</div>
+    <p>境界値問題：</p>
+    \[\frac{\partial T}{\partial t} = \kappa\frac{\partial^2 T}{\partial x^2},\quad 0<x<L,\;t>0\]
+    \[T(0,t)=T(L,t)=0,\quad T(x,0)=T_0\sin\frac{\pi x}{L}\]
+    <h3>（1）</h3>
+    <p>変数分離で特解を求めよ。</p>
+    <h3>（2）</h3>
+    <p>初期条件が \(T(x,0)=T_0\)（一定）の場合、Fourier正弦展開して一般解を求めよ：</p>
+    \[T_0 = \sum_{n=1}^\infty b_n\sin\frac{n\pi x}{L},\quad b_n = \frac{2T_0}{n\pi}(1-\cos n\pi)\]
+    <h3>（3）</h3>
+    <p>\(t\to\infty\) の極限を調べ、どの Fourier モードが最も遅く減衰するかを示せ。熱拡散の「時定数」\(\tau_n = L^2/(\kappa n^2\pi^2)\) を求めよ。</p>
+    <h3>（4）</h3>
+    <p>Schrödinger方程式（虚時間版）との形式的対応を述べよ：\(\dfrac{\partial\psi}{\partial\tau}=\dfrac{\hbar}{2m}\dfrac{\partial^2\psi}{\partial x^2}\)（\(\tau=it/\hbar\) の解析接続）。</p>
+    <div class="hint"><strong>ヒント：</strong> 熱方程式の解は「時間で指数減衰する」。高次モードほど速く減衰する。</div>
+  </div>
+
+  <!-- P3 -->
+  <div class="problem">
+    <div class="problem-header"><span class="pnum">問題 3</span><span class="ptitle">Laplace方程式と静電ポテンシャル</span></div>
+    <div class="context">物理的文脈：静電場・定常流・重力ポテンシャル。</div>
+    <p>矩形領域 \(0\le x\le a,\;0\le y\le b\) での Laplace 方程式：</p>
+    \[\frac{\partial^2\phi}{\partial x^2}+\frac{\partial^2\phi}{\partial y^2}=0\]
+    <p>境界条件：\(\phi(0,y)=\phi(a,y)=0,\;\phi(x,0)=0,\;\phi(x,b)=V_0\sin(\pi x/a)\)</p>
+    <h3>（1）</h3>
+    <p>変数分離 \(\phi = X(x)Y(y)\) で解き、\(X\) の境界条件から固有関数を決定せよ。</p>
+    <h3>（2）</h3>
+    <p>境界条件 \(\phi(x,b)=V_0\sin(\pi x/a)\) から係数を決定し、特解を求めよ。</p>
+    <h3>（3）</h3>
+    <p>右辺が \(\phi(x,b) = V(x)\)（一般の関数）の場合、Fourier 正弦展開で一般解を書け。</p>
+    <div class="hint"><strong>ヒント：</strong> \(Y\) の方程式は \(Y''-\lambda^2 Y=0\) 形。両端条件から \(\sinh(\lambda y)\) と \(\sinh(\lambda(b-y))\) の組み合わせを使う。</div>
+  </div>
+
+  <!-- P4 -->
+  <div class="problem">
+    <div class="problem-header"><span class="pnum">問題 4</span><span class="ptitle">無限深さの量子井戸とエネルギー準位</span></div>
+    <div class="context">物理的文脈：量子力学の基礎 — 粒子の量子化エネルギー。固体の電子状態の最簡単モデル。</div>
+    <p>幅 \(L\) の無限深さ量子井戸（\(V=0\) for \(0<x<L\)，\(V=\infty\) otherwise）の時間非依存 Schrödinger 方程式：</p>
+    \[-\frac{\hbar^2}{2m}\frac{d^2\psi}{dx^2} = E\psi,\quad \psi(0)=\psi(L)=0\]
+    <h3>（1）</h3>
+    <p>固有値（許容エネルギー）\(E_n\) を求めよ。</p>
+    <h3>（2）</h3>
+    <p>規格化された固有関数 \(\psi_n(x)\) を求めよ：\(\displaystyle\int_0^L|\psi_n|^2 dx = 1\)</p>
+    <h3>（3）</h3>
+    <p>固有関数の直交性 \(\displaystyle\int_0^L\psi_m\psi_n\,dx = \delta_{mn}\) を示せ。</p>
+    <h3>（4）</h3>
+    <p>初期状態 \(\psi(x,0) = \sqrt{30/L^5}\,x(L-x)\) を固有関数展開し \(\psi(x,t)\) を求めよ。</p>
+    <div class="hint"><strong>ヒント：</strong> (4) 展開係数 \(c_n=\int_0^L\psi_n(x)\psi(x,0)dx\)。時間依存は \(e^{-iE_n t/\hbar}\) を掛けるだけ。</div>
+  </div>
+
+  <div class="nav">
+    <a class="btn btn-back" href="index.html">← 一覧</a>
+    <a class="btn btn-ans" href="level_04_answer.html">解答を見る →</a>
+  </div>
+</div>
+</body>
+</html>

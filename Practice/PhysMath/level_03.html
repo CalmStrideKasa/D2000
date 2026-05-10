@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Level 3 — 線形代数の物理応用</title>
+  <script>MathJax={tex:{inlineMath:[['\\(','\\)'],['$','$']],displayMath:[['\\[','\\]'],['$$','$$']],tags:'ams'}};</script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;padding:40px 20px;line-height:1.9}.container{max-width:860px;margin:0 auto}h1{font-size:1.6rem;color:#f8fafc;margin-bottom:4px}.meta{color:#64748b;font-size:.88rem;margin-bottom:40px}.problem{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:24px 28px;margin:28px 0}.problem-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}.pnum{background:#6366f1;color:white;font-weight:700;font-size:.85rem;padding:3px 12px;border-radius:20px}.ptitle{font-size:1.05rem;color:#f1f5f9;font-weight:600}.context{background:#0f172a;border-left:3px solid #6366f1;padding:10px 16px;margin-bottom:14px;font-size:.88rem;color:#94a3b8;border-radius:0 6px 6px 0}.hint{background:#0f172a;border:1px solid #f59e0b;border-radius:6px;padding:12px 16px;margin-top:14px;font-size:.87rem;color:#fcd34d}.hint strong{color:#fbbf24}p{color:#cbd5e1;margin-bottom:10px}h3{color:#94a3b8;font-size:.95rem;margin:16px 0 6px}.nav{display:flex;justify-content:space-between;margin-top:48px}.btn{padding:10px 20px;border-radius:6px;text-decoration:none;font-size:.88rem;font-weight:600}.btn-back{background:#1e293b;color:#94a3b8;border:1px solid #475569}.btn-ans{background:#6366f1;color:white}
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Level 3 ★★★☆☆☆☆ — 線形代数の物理応用</h1>
+  <p class="meta">テーマ: 慣性テンソル・行列指数・射影演算子・二次形式　|　Introductionのセクション3を参照</p>
+
+  <!-- P1 -->
+  <div class="problem">
+    <div class="problem-header"><span class="pnum">問題 1</span><span class="ptitle">慣性テンソルの対角化と主軸</span></div>
+    <div class="context">物理的文脈：剛体の回転運動 — ジャイロスコープ・人工衛星の姿勢制御。</div>
+    <p>均一密度の細い平板（質量 \(M\)）が \(xy\) 平面にあり、頂点が \((0,0),\,(a,0),\,(0,b)\) の直角三角形とする。重心周りの慣性テンソルを求めるため、以下に答えよ。</p>
+    <h3>（1）</h3>
+    <p>重心の座標 \(\mathbf{r}_G = (x_G, y_G)\) を求めよ。</p>
+    <h3>（2）</h3>
+    <p>原点周りの慣性テンソル成分 \(I_{xx}^{(0)}, I_{yy}^{(0)}, I_{xy}^{(0)}\) を面積分で計算せよ（\(z=0\) 平面なので \(I_{zz}^{(0)} = I_{xx}^{(0)} + I_{yy}^{(0)}\)）。</p>
+    <h3>（3）</h3>
+    <p>平行軸定理を用いて重心周りの慣性テンソル \(I_{ij}^{(G)}\) を求めよ。</p>
+    <h3>（4）</h3>
+    <p>\(I^{(G)}\) の固有値（主慣性モーメント）と固有ベクトル（主軸方向）を求めよ。</p>
+    <div class="hint"><strong>ヒント：</strong> 三角形の領域は \(0\le x\le a,\; 0\le y\le b(1-x/a)\)。平行軸定理：\(I_{ij}^{(G)} = I_{ij}^{(0)} - M(r_G^2\delta_{ij} - r_{Gi}r_{Gj})\)（テンソル形）。</div>
+  </div>
+
+  <!-- P2 -->
+  <div class="problem">
+    <div class="problem-header"><span class="pnum">問題 2</span><span class="ptitle">行列の指数関数と回転</span></div>
+    <div class="context">物理的文脈：Lie群・量子力学のユニタリ変換・連続対称性の生成子。</div>
+    <p>行列 \(A = \begin{pmatrix}0 & -\omega \\ \omega & 0\end{pmatrix}\) （\(\omega > 0\)）について答えよ。</p>
+    <h3>（1）</h3>
+    <p>\(A^2, A^3, A^4\) を計算し、一般の \(A^n\) のパターンを推測せよ。</p>
+    <h3>（2）</h3>
+    <p>行列指数関数の定義 \(e^{At} = \displaystyle\sum_{n=0}^\infty \dfrac{(At)^n}{n!}\) を偶数項・奇数項に分離し：</p>
+    \[e^{At} = \begin{pmatrix}\cos\omega t & -\sin\omega t \\ \sin\omega t & \cos\omega t\end{pmatrix}\]
+    を導け。</p>
+    <h3>（3）</h3>
+    <p>初期条件 \(\mathbf{x}(0) = (x_0, 0)^T\) に対し、\(\dot{\mathbf{x}} = A\mathbf{x}\) の解は \(\mathbf{x}(t) = e^{At}\mathbf{x}(0)\) である。この解の物理的意味を述べよ。</p>
+    <h3>（4）</h3>
+    <p>\(A\) の固有値・固有ベクトルを求め、\(e^{At}\) を固有分解から導出せよ（\(A = PDP^{-1}\) を使う）。</p>
+    <div class="hint"><strong>ヒント：</strong> \(A^2 = -\omega^2 I\) を利用。固有値は複素数 \(\pm i\omega\)。</div>
+  </div>
+
+  <!-- P3 -->
+  <div class="problem">
+    <div class="problem-header"><span class="pnum">問題 3</span><span class="ptitle">射影演算子とスペクトル分解</span></div>
+    <div class="context">物理的文脈：量子力学の測定理論 — 観測によるwave function collapse。</div>
+    <p>エルミート行列（量子観測量）\(H = \begin{pmatrix}1 & 2 \\ 2 & 4\end{pmatrix}\) について答えよ。</p>
+    <h3>（1）</h3>
+    <p>固有値 \(\lambda_1, \lambda_2\) と対応する規格化固有ベクトル \(|\phi_1\rangle, |\phi_2\rangle\) を求めよ。</p>
+    <h3>（2）</h3>
+    <p>各固有状態への射影演算子 \(P_i = |\phi_i\rangle\langle\phi_i|\) を行列で表せ。</p>
+    <h3>（3）</h3>
+    <p>以下の性質を示せ：
+    \[P_1 + P_2 = I, \qquad P_i^2 = P_i, \qquad P_1 P_2 = 0, \qquad H = \lambda_1 P_1 + \lambda_2 P_2\]</p>
+    <h3>（4）</h3>
+    <p>状態 \(|\psi\rangle = (1,0)^T\) を観測したとき、固有値 \(\lambda_1\) が得られる確率を \(|\langle\phi_1|\psi\rangle|^2\) で計算せよ。</p>
+    <div class="hint"><strong>ヒント：</strong> \(|P\rangle\langle P|\) はブラケット記法で外積（列ベクトル × 行ベクトル）。</div>
+  </div>
+
+  <!-- P4 -->
+  <div class="problem">
+    <div class="problem-header"><span class="pnum">問題 4</span><span class="ptitle">二次形式と安定性の判定</span></div>
+    <div class="context">物理的文脈：多自由度系の平衡点の安定性 — ポテンシャルエネルギーの極小判定。</div>
+    <p>2自由度系のポテンシャルエネルギー（平衡点近傍での展開）：</p>
+    \[V(q_1,q_2) = 3q_1^2 + 2q_1 q_2 + 3q_2^2\]
+    について答えよ。</p>
+    <h3>（1）</h3>
+    <p>\(V\) を行列 \(K\) を使って \(V = \mathbf{q}^T K\mathbf{q}\) と書き、\(K\) を明示せよ。</p>
+    <h3>（2）</h3>
+    <p>Sylvester の判定条件（主小行列式がすべて正 \(\Leftrightarrow\) 正定値）を用いて \(V\) が正定値かどうか判定せよ。</p>
+    <h3>（3）</h3>
+    <p>\(K\) を対角化し（固有値・固有ベクトルを求めよ）、正規座標 \(\xi_i\) を使って \(V = \lambda_1\xi_1^2 + \lambda_2\xi_2^2\) と書け。</p>
+    <h3>（4）</h3>
+    <p>この系の運動方程式（\(m=1\) として）\(\ddot{\mathbf{q}} = -2K\mathbf{q}\) の正規振動数を求めよ。</p>
+    <div class="hint"><strong>ヒント：</strong> \(V\) の行列は対称行列 \(K_{ij} = \partial^2 V/\partial q_i\partial q_j / 2\)。</div>
+  </div>
+
+  <div class="nav">
+    <a class="btn btn-back" href="index.html">← 一覧</a>
+    <a class="btn btn-ans" href="level_03_answer.html">解答を見る →</a>
+  </div>
+</div>
+</body>
+</html>

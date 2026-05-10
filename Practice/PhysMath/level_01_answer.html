@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Level 1 解答 — ベクトル解析</title>
+  <script>
+    MathJax = { tex: { inlineMath: [['\\(','\\)'],['$','$']], displayMath: [['\\[','\\]'],['$$','$$']], tags: 'ams' } };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; padding: 40px 20px; line-height: 1.9; }
+    .container { max-width: 860px; margin: 0 auto; }
+    h1 { font-size: 1.6rem; color: #f8fafc; margin-bottom: 4px; }
+    .meta { color: #64748b; font-size: 0.88rem; margin-bottom: 40px; }
+    .sol { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 24px 28px; margin: 28px 0; }
+    .sol-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .pnum { background: #059669; color: white; font-weight: 700; font-size: 0.85rem; padding: 3px 12px; border-radius: 20px; }
+    .ptitle { font-size: 1.05rem; color: #f1f5f9; font-weight: 600; }
+    h3 { color: #a5b4fc; font-size: 0.98rem; margin: 20px 0 8px; border-left: 3px solid #6366f1; padding-left: 10px; }
+    p { color: #cbd5e1; margin-bottom: 10px; }
+    .key { background: #0f172a; border: 1px solid #6366f1; border-radius: 6px; padding: 14px 18px; margin: 14px 0; }
+    .key strong { color: #818cf8; }
+    .nav { display: flex; justify-content: space-between; margin-top: 48px; }
+    .btn { padding: 10px 20px; border-radius: 6px; text-decoration: none; font-size: 0.88rem; font-weight: 600; }
+    .btn-back { background: #1e293b; color: #94a3b8; border: 1px solid #475569; }
+    .btn-next { background: #6366f1; color: white; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Level 1 解答 — ベクトル解析</h1>
+  <p class="meta">★☆☆☆☆☆☆</p>
+
+  <!-- Sol 1 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 1</span><span class="ptitle">スカラー場の勾配と方向微分</span></div>
+
+    <h3>（1）勾配 \(\nabla\phi\) の計算</h3>
+    <p>各成分を偏微分する：</p>
+    \[\frac{\partial\phi}{\partial x} = 2xy,\quad \frac{\partial\phi}{\partial y} = x^2 + z^2,\quad \frac{\partial\phi}{\partial z} = 2yz\]
+    <p>点 \(P=(1,2,-1)\) を代入：</p>
+    \[\nabla\phi\Big|_P = (2\cdot1\cdot2,\;1^2+(-1)^2,\;2\cdot2\cdot(-1)) = (4,\,2,\,-4)\]
+
+    <h3>（2）方向微分</h3>
+    \[D_\mathbf{n}\phi = \nabla\phi\cdot\mathbf{n} = (4,2,-4)\cdot\frac{1}{\sqrt{3}}(1,1,1) = \frac{4+2-4}{\sqrt{3}} = \frac{2}{\sqrt{3}} = \frac{2\sqrt{3}}{3}\]
+
+    <h3>（3）最大変化方向</h3>
+    <p>\(\phi\) が最も急増する方向は \(\nabla\phi\) 自身の方向：</p>
+    \[\mathbf{n}_{\max} = \frac{\nabla\phi}{|\nabla\phi|} = \frac{(4,2,-4)}{\sqrt{16+4+16}} = \frac{(4,2,-4)}{6} = \left(\frac{2}{3},\frac{1}{3},-\frac{2}{3}\right)\]
+    <p>最大変化率は \(|\nabla\phi|_P = 6\)。</p>
+    <div class="key"><strong>物理的意味：</strong> \(\nabla\phi\) は等ポテンシャル面に垂直な方向を指し、その大きさがその点での場の「急峻さ」を表す。</div>
+  </div>
+
+  <!-- Sol 2 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 2</span><span class="ptitle">電場の発散とGaussの法則</span></div>
+
+    <h3>（1）発散</h3>
+    \[\nabla\cdot\mathbf{E} = \frac{\partial}{\partial x}(2xz) + \frac{\partial}{\partial y}(-y^2) + \frac{\partial}{\partial z}(y^2z) = 2z - 2y + y^2\]
+
+    <h3>（2）電荷密度（点 \((1,1,1)\)）</h3>
+    \[\rho = \varepsilon_0\,\nabla\cdot\mathbf{E}\Big|_{(1,1,1)} = \varepsilon_0(2\cdot1 - 2\cdot1 + 1^2) = \varepsilon_0\]
+
+    <h3>（3）Gaussの定理の確認</h3>
+    <p>体積積分（\(0\le x,y,z\le 2\)）：</p>
+    \begin{align}
+    \iiint_V (2z-2y+y^2)\,dV &= \int_0^2\!\int_0^2\!\int_0^2 (2z-2y+y^2)\,dx\,dy\,dz \\
+    &= 2\int_0^2\!\int_0^2 (2z-2y+y^2)\,dy\,dz \\
+    &= 2\int_0^2 \left[2zy - y^2 + \frac{y^3}{3}\right]_0^2 dz \\
+    &= 2\int_0^2 \left(4z - 4 + \frac{8}{3}\right)dz \\
+    &= 2\left[2z^2 - 4z + \frac{8}{3}z\right]_0^2 \\
+    &= 2\left(8 - 8 + \frac{16}{3}\right) = \frac{32}{3}
+    \end{align}
+    <div class="key"><strong>結果：</strong> 面積分も同じ \(32/3\) になる（確認は各面で \(\mathbf{E}\cdot\hat{n}\,dS\) を積分）。Gaussの定理が成立。</div>
+  </div>
+
+  <!-- Sol 3 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 3</span><span class="ptitle">磁場の回転とStokesの定理</span></div>
+
+    <h3>（1）回転</h3>
+    \[\nabla\times\mathbf{F} = \begin{vmatrix}\mathbf{e}_x&\mathbf{e}_y&\mathbf{e}_z\\\partial_x&\partial_y&\partial_z\\-y&x&0\end{vmatrix} = \mathbf{e}_x(0-0) - \mathbf{e}_y(0-0) + \mathbf{e}_z(1-(-1)) = 2\mathbf{e}_z\]
+
+    <h3>（2）Stokesの定理の両辺</h3>
+    <p><strong>右辺（面積分）：</strong> \(d\mathbf{S} = dS\,\mathbf{e}_z\)、\((\nabla\times\mathbf{F})\cdot\mathbf{e}_z = 2\)</p>
+    \[\iint_S (\nabla\times\mathbf{F})\cdot d\mathbf{S} = 2\pi R^2\]
+    <p><strong>左辺（線積分）：</strong> \(x=R\cos\theta,\,y=R\sin\theta\) とすると \(d\mathbf{l} = (-R\sin\theta,R\cos\theta,0)d\theta\)</p>
+    \begin{align}
+    \oint_C\mathbf{F}\cdot d\mathbf{l} &= \int_0^{2\pi}(-R\sin\theta,R\cos\theta,0)\cdot(-R\sin\theta,R\cos\theta,0)\,d\theta \\
+    &= \int_0^{2\pi}(R^2\sin^2\theta + R^2\cos^2\theta)\,d\theta = \int_0^{2\pi} R^2\,d\theta = 2\pi R^2
+    \end{align}
+    <p>両辺一致 ✓</p>
+
+    <h3>（3）剛体回転との対応</h3>
+    <p>\(\boldsymbol{\omega} = \omega\mathbf{e}_z\)，\(\mathbf{r} = (x,y,z)\) として：</p>
+    \[\mathbf{v} = \boldsymbol{\omega}\times\mathbf{r} = (\omega e_z)\times(x,y,z) = (-\omega y,\,\omega x,\,0)\]
+    <p>\(\omega = 1\) の場合これは \(\mathbf{F}\) に一致。また \(\nabla\times\mathbf{v} = 2\omega\mathbf{e}_z = 2\boldsymbol{\omega}\) ✓</p>
+    <div class="key"><strong>物理的意味：</strong> 渦度 \(\boldsymbol{\xi} = \nabla\times\mathbf{v} = 2\boldsymbol{\omega}\) は剛体回転の角速度の2倍。</div>
+  </div>
+
+  <!-- Sol 4 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 4</span><span class="ptitle">重力ポテンシャルとLaplacian</span></div>
+
+    <h3>（1）勾配（重力加速度）</h3>
+    <p>\(\dfrac{\partial r}{\partial x} = \dfrac{x}{r}\) を使って：</p>
+    \[\frac{\partial\phi}{\partial x} = \frac{\partial}{\partial x}\left(-\frac{GM}{r}\right) = \frac{GM}{r^2}\cdot\frac{x}{r} = \frac{GMx}{r^3}\]
+    <p>同様に \(y,z\) 成分も計算すると：</p>
+    \[\nabla\phi = \frac{GM}{r^3}(x,y,z) = \frac{GM}{r^3}\mathbf{r}\]
+    \[\therefore\quad \mathbf{g} = -\nabla\phi = -\frac{GM}{r^3}\mathbf{r}\quad\checkmark\]
+
+    <h3>（2）Laplacian（\(r>0\)）</h3>
+    <p>球対称関数 \(f(r)=-GM/r\) に対して \(f'(r)=GM/r^2,\;f''(r)=-2GM/r^3\) なので：</p>
+    \[\nabla^2\phi = f''(r)+\frac{2}{r}f'(r) = -\frac{2GM}{r^3}+\frac{2GM}{r^3} = 0\quad (r>0)\quad\checkmark\]
+
+    <h3>（3）\(r^n\) のLaplacian</h3>
+    <p>\(f(r)=r^n\) に対して \(f'=nr^{n-1},\;f''=n(n-1)r^{n-2}\) より：</p>
+    \[\nabla^2(r^n) = n(n-1)r^{n-2} + \frac{2}{r}\cdot nr^{n-1} = n(n-1)r^{n-2}+2nr^{n-2} = n(n+1)r^{n-2}\quad\checkmark\]
+    <p>\(n=-1\) の場合 \(n(n+1)=(-1)(0)=0\) となり (2) と一致 ✓</p>
+  </div>
+
+  <div class="nav">
+    <a class="btn btn-back" href="level_01.html">← 問題に戻る</a>
+    <a class="btn btn-next" href="level_02.html">Level 2 →</a>
+  </div>
+</div>
+</body>
+</html>

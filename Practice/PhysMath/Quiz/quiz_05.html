@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Lv.5 — テンソル解析</title>
+  <script>MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style']}}</script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;padding:20px 16px;line-height:1.7;min-height:100vh}
+    .header{max-width:520px;margin:0 auto 20px}
+    .title{font-size:1.1rem;color:#f8fafc;font-weight:700;margin-bottom:10px}
+    .prog-bar-wrap{background:#1e293b;border-radius:99px;height:6px;margin-bottom:6px}
+    .prog-bar{background:#6366f1;height:6px;border-radius:99px;transition:width 0.3s}
+    .prog-text{font-size:0.78rem;color:#64748b;text-align:right}
+    .card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;max-width:520px;margin:0 auto}
+    .qnum{display:inline-block;background:#6366f1;color:white;font-size:0.75rem;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:12px}
+    .qtext{color:#f1f5f9;font-size:0.97rem;margin-bottom:18px;line-height:1.8}
+    .opt{display:block;width:100%;text-align:left;background:#0f172a;border:1px solid #334155;color:#e2e8f0;padding:14px 16px;border-radius:8px;margin-bottom:10px;font-size:0.93rem;cursor:pointer;transition:border-color 0.15s,background 0.15s;line-height:1.6}
+    .opt:hover:not(:disabled){border-color:#6366f1;background:#1e293b}
+    .opt.correct{background:#064e3b;border-color:#10b981;color:#6ee7b7}
+    .opt.wrong{background:#450a0a;border-color:#ef4444;color:#fca5a5}
+    .opt:disabled{cursor:default}
+    .explain{display:none;background:#0f172a;border-left:3px solid #6366f1;border-radius:0 8px 8px 0;padding:14px 16px;margin-top:4px;font-size:0.88rem;color:#94a3b8;line-height:1.8}
+    .explain.show{display:block}
+    .explain strong{color:#818cf8}
+    .next-btn{display:none;width:100%;background:#6366f1;color:white;border:none;padding:14px;border-radius:8px;font-size:0.97rem;font-weight:600;cursor:pointer;margin-top:14px}
+    .next-btn.show{display:block}
+    .result{text-align:center;padding:32px 16px;max-width:520px;margin:0 auto}
+    .result h2{font-size:1.4rem;color:#f8fafc;margin-bottom:12px}
+    .score{font-size:3rem;font-weight:700;color:#6366f1;margin:16px 0}
+    .score span{font-size:1.2rem;color:#94a3b8}
+    .result p{color:#94a3b8;margin-bottom:24px}
+    .result-btns{display:flex;gap:10px;flex-direction:column}
+    .btn-retry{background:#6366f1;color:white;border:none;padding:14px;border-radius:8px;font-size:0.97rem;font-weight:600;cursor:pointer}
+    .btn-back{background:#1e293b;color:#94a3b8;border:1px solid #475569;padding:14px;border-radius:8px;font-size:0.97rem;font-weight:600;cursor:pointer;text-decoration:none;display:block;text-align:center}
+    .nav{max-width:520px;margin:16px auto 0;text-align:center}
+    .nav a{color:#64748b;font-size:0.82rem;text-decoration:none}
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="title">Lv.5 テンソル解析</div>
+  <div class="prog-bar-wrap"><div class="prog-bar" id="bar" style="width:0%"></div></div>
+  <div class="prog-text" id="prog">0 / 10</div>
+</div>
+<div id="app"></div>
+<div class="nav"><a href="index.html">← クイズ一覧</a></div>
+
+<script>
+const Q = [
+  {
+    q: 'Einstein縮約記法で \\(a_i b^i\\) は何を意味するか？',
+    opts: [
+      '\\(\\sum_{i=1}^3 a_i b^i = a_1b^1+a_2b^2+a_3b^3\\)（内積）',
+      '\\(a_i\\) と \\(b^i\\) のテンソル積（外積）',
+      '\\(a_i\\) を \\(b^i\\) で微分した量',
+      '\\(3a_ib^i\\)（3倍）'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> Einstein縮約：同じ添字が上と下に1回ずつ現れたら和をとる約束。\\(a_i b^i=\\sum_i a_ib^i\\)。3次元では \\(a_1b^1+a_2b^2+a_3b^3\\) でベクトルの内積。\\(\\sum\\) 記号を省略できるので計算が非常に簡潔になります。'
+  },
+  {
+    q: 'Levi-Civitaシンボル \\(\\varepsilon_{123}\\) と \\(\\varepsilon_{132}\\) の値はそれぞれどれか？',
+    opts: [
+      '\\(\\varepsilon_{123}=+1\\)、\\(\\varepsilon_{132}=-1\\)',
+      '\\(\\varepsilon_{123}=+1\\)、\\(\\varepsilon_{132}=+1\\)',
+      '\\(\\varepsilon_{123}=-1\\)、\\(\\varepsilon_{132}=+1\\)',
+      '\\(\\varepsilon_{123}=0\\)、\\(\\varepsilon_{132}=0\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\(\\varepsilon_{ijk}\\) は偶置換（123→231→312）で +1、奇置換（132→213→321）で -1、重複（\\(i=j\\) など）で 0。\\(\\varepsilon_{123}=+1\\)（偶置換）、\\(\\varepsilon_{132}=-1\\)（132は奇置換：1つの互換）。外積の成分表示 \\((\\mathbf{A}\\times\\mathbf{B})_i=\\varepsilon_{ijk}A_jB_k\\) で使います。'
+  },
+  {
+    q: 'Levi-Civitaの恒等式 \\(\\varepsilon_{ijk}\\varepsilon^{ilm}\\) の正しい値はどれか？',
+    opts: [
+      '\\(\\delta^l_j\\delta^m_k - \\delta^m_j\\delta^l_k\\)',
+      '\\(\\delta^l_j\\delta^m_k + \\delta^m_j\\delta^l_k\\)',
+      '\\(\\delta_{jk}\\delta^{lm}\\)',
+      '\\(\\varepsilon^{jklm}\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> この恒等式は \\(\\varepsilon\\varepsilon\\) 縮約の基本公式です。\\(i\\) で縮約すると \\(\\varepsilon_{ijk}\\varepsilon^{ilm}=\\delta^l_j\\delta^m_k-\\delta^m_j\\delta^l_k\\)。これを使って BAC-CAB則 \\((\\mathbf{A}\\times\\mathbf{B})\\times\\mathbf{C}=\\mathbf{B}(\\mathbf{A}\\cdot\\mathbf{C})-\\mathbf{A}(\\mathbf{B}\\cdot\\mathbf{C})\\) などのベクトル恒等式を機械的に証明できます。'
+  },
+  {
+    q: 'ベクトル恒等式 \\(\\nabla\\times(\\nabla\\times\\mathbf{F})\\) をインデックス記法で展開した結果はどれか？',
+    opts: [
+      '\\(\\nabla(\\nabla\\cdot\\mathbf{F})-\\nabla^2\\mathbf{F}\\)',
+      '\\(\\nabla^2(\\nabla\\cdot\\mathbf{F})\\)',
+      '\\(\\nabla(\\nabla\\times\\mathbf{F})\\)',
+      '\\((\\nabla\\cdot\\mathbf{F})\\mathbf{F}\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\(\\varepsilon_{ijk}\\varepsilon_{jlm}\\partial_l\\partial_m F_k\\) を \\(\\varepsilon\\varepsilon\\) 恒等式で展開。\\(\\nabla\\cdot\\mathbf{E}=0\\)（真空中）と組み合わせると電磁波の方程式 \\(\\nabla^2\\mathbf{E}=\\mu_0\\varepsilon_0\\ddot{\\mathbf{E}}\\) が導けます（Level 5 問題1）。'
+  },
+  {
+    q: '電磁場テンソル \\(F^{\\mu\\nu}\\) で \\(F^{01}\\) の値はどれか？（\\(x^0=ct,\\,x^1=x,\\,\\mathbf{E}=(E_x,E_y,E_z)\\)）',
+    opts: [
+      '\\(-E_x/c\\)',
+      '\\(E_x/c\\)',
+      '\\(-B_x\\)',
+      '\\(B_x\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\(F^{\\mu\\nu}=\\partial^\\mu A^\\nu-\\partial^\\nu A^\\mu\\) の定義から \\(F^{0i}=-E_i/c\\)（反対称性 \\(F^{\\mu\\nu}=-F^{\\nu\\mu}\\) より \\(F^{i0}=E_i/c\\)）。時空間成分が電場、空間成分が磁場を記述します。この行列を知っておけばLorentz変換後の場も計算できます。'
+  },
+  {
+    q: 'Christoffel記号 \\(\\Gamma^k_{ij}\\) の定義式はどれか？（\\(g_{ij}\\) は計量テンソル）',
+    opts: [
+      '\\(\\Gamma^k_{ij}=\\frac{1}{2}g^{kl}(\\partial_i g_{jl}+\\partial_j g_{il}-\\partial_l g_{ij})\\)',
+      '\\(\\Gamma^k_{ij}=\\partial_i\\partial_j x^k\\)',
+      '\\(\\Gamma^k_{ij}=g^{kl}\\partial_l g_{ij}\\)',
+      '\\(\\Gamma^k_{ij}=\\frac{1}{2}(\\partial_i g_{jk}+\\partial_j g_{ik})\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> Christoffel記号は計量テンソルの1階微分から構成されます。「接続係数」とも呼ばれ、曲がった空間での微分（共変微分）を定義します。計量が定数（平坦空間）なら \\(\\Gamma=0\\)。球座標では \\(g=\\mathrm{diag}(1,r^2,r^2\\sin^2\\theta)\\) の微分から非自明なChristoffel記号が生じます。'
+  },
+  {
+    q: '球座標系 \\((r,\\theta,\\varphi)\\) の計量テンソル \\(g_{ij}\\) はどれか？',
+    opts: [
+      '\\(\\mathrm{diag}(1,\\,r^2,\\,r^2\\sin^2\\theta)\\)',
+      '\\(\\mathrm{diag}(1,\\,1,\\,1)\\)',
+      '\\(\\mathrm{diag}(r^2,\\,r^2,\\,r^2)\\)',
+      '\\(\\mathrm{diag}(1,\\,r,\\,r\\sin\\theta)\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> 線素 \\(ds^2=dr^2+r^2d\\theta^2+r^2\\sin^2\\theta\\,d\\varphi^2\\) から \\(g_{rr}=1,\\,g_{\\theta\\theta}=r^2,\\,g_{\\varphi\\varphi}=r^2\\sin^2\\theta\\)（非対角成分はゼロ）。この計量からChristoffel記号を計算し、測地線方程式に代入すると惑星の軌道などが得られます。'
+  },
+  {
+    q: '4元速度 \\(u^\\mu=dx^\\mu/d\\tau\\)（\\(\\tau\\) は固有時）の時間成分 \\(u^0\\) はどれか？（\\(\\gamma=(1-v^2/c^2)^{-1/2}\\)）',
+    opts: [
+      '\\(\\gamma c\\)',
+      '\\(\\gamma v\\)',
+      '\\(c\\)',
+      '\\(v/c\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\(u^0=dx^0/d\\tau=c\\,dt/d\\tau\\)。固有時と座標時の関係 \\(d\\tau=dt/\\gamma\\) より \\(u^0=c\\gamma\\)。4元速度は \\(u^\\mu u_\\mu=\\eta_{\\mu\\nu}u^\\mu u^\\nu=-c^2\\)（規格化条件）を満たします。Lorentz力の4元形式 \\(f^\\mu=qF^{\\mu\\nu}u_\\nu\\) に使います。'
+  },
+  {
+    q: 'テンソルの変換則で、共変テンソル \\(T_{\\mu\\nu}\\) の変換式はどれか？（\\(\\Lambda^\\mu{}_{\\nu}\\) はLorentz変換）',
+    opts: [
+      '\\(T\'_{\\mu\\nu}=\\Lambda^\\alpha{}_\\mu\\Lambda^\\beta{}_\\nu T_{\\alpha\\beta}\\)',
+      '\\(T\'_{\\mu\\nu}=\\Lambda^\\mu{}_\\alpha\\Lambda^\\nu{}_\\beta T^{\\alpha\\beta}\\)',
+      '\\(T\'_{\\mu\\nu}=\\Lambda^\\mu{}_\\alpha T_{\\alpha\\nu}\\)',
+      '\\(T\'_{\\mu\\nu}=T_{\\mu\\nu}\\)（不変）'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> 添字の位置（上・下）が変換の仕方を決めます。共変テンソル（添字下）は \\(T\'_{\\mu\\nu}=(\\Lambda^{-1})^\\alpha_\\mu(\\Lambda^{-1})^\\beta_\\nu T_{\\alpha\\beta}\\) で変換されます。Lorentz変換では \\((\\Lambda^{-1})^\\alpha_\\mu=\\Lambda^\\alpha{}_\\mu\\)（直交性）。電磁場テンソル \\(F^{\\mu\\nu}\\) は反変2階テンソルです。'
+  },
+  {
+    q: '応力テンソル \\(\\sigma_{ij}\\) が対称である（\\(\\sigma_{ij}=\\sigma_{ji}\\)）のはなぜか？',
+    opts: [
+      '角運動量保存則（トルクの釣り合い）から導かれるから',
+      '質量保存則から導かれるから',
+      '定義によって自動的に対称になるから',
+      'Christoffel記号が対称だから'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> 連続体の微小体積要素にはたらくトルクを考えると、角運動量保存のために \\(\\sigma_{ij}=\\sigma_{ji}\\) が必要です。非対称な応力テンソルでは体積要素が有限の角加速度を持つことになり、連続体力学と矛盾します。対称性により独立成分は9個→6個に減ります。'
+  }
+];
+
+let cur = 0, score = 0, answered = false;
+
+function render() {
+  const q = Q[cur];
+  document.getElementById('bar').style.width = (cur / Q.length * 100) + '%';
+  document.getElementById('prog').textContent = cur + ' / ' + Q.length;
+  const optsHTML = q.opts.map((o, i) =>
+    `<button class="opt" onclick="choose(this,${i===q.ans})" id="opt${i}">${o}</button>`
+  ).join('');
+  document.getElementById('app').innerHTML =
+    `<div class="card">
+      <span class="qnum">問題 ${cur+1} / ${Q.length}</span>
+      <div class="qtext">${q.q}</div>
+      ${optsHTML}
+      <div class="explain" id="explain">📖 ${q.ex}</div>
+      <button class="next-btn" id="nxt" onclick="next()">${cur+1<Q.length?'次の問題 →':'結果を見る'}</button>
+    </div>`;
+  if (window.MathJax) MathJax.typesetPromise();
+  answered = false;
+}
+
+function choose(el, correct) {
+  if (answered) return;
+  answered = true;
+  document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+  if (correct) { el.classList.add('correct'); score++; }
+  else { el.classList.add('wrong'); document.getElementById('opt'+Q[cur].ans).classList.add('correct'); }
+  document.getElementById('explain').classList.add('show');
+  document.getElementById('nxt').classList.add('show');
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+function next() {
+  cur++;
+  if (cur >= Q.length) showResult();
+  else render();
+}
+
+function showResult() {
+  document.getElementById('bar').style.width = '100%';
+  document.getElementById('prog').textContent = Q.length + ' / ' + Q.length;
+  const msg = score===Q.length ? '完璧！演習問題に挑戦しましょう 🎉' :
+              score>=8 ? 'よくできました！' :
+              score>=6 ? '基本は理解できています。苦手を復習しましょう。' :
+              'Introduction のセクション3〜6を読み直してから再挑戦しましょう。';
+  document.getElementById('app').innerHTML =
+    `<div class="result">
+      <h2>クイズ完了</h2>
+      <div class="score">${score}<span> / ${Q.length}</span></div>
+      <p>${msg}</p>
+      <div class="result-btns">
+        <button class="btn-retry" onclick="restart()">もう一度挑戦する</button>
+        <a class="btn-back" href="../level_05.html">Level 5 演習問題を解く →</a>
+        <a class="btn-back" href="index.html">クイズ一覧に戻る</a>
+      </div>
+    </div>`;
+}
+
+function restart() { cur = 0; score = 0; render(); }
+render();
+</script>
+</body>
+</html>

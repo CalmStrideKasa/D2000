@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Level 3 解答 — 線形代数の物理応用</title>
+  <script>MathJax={tex:{inlineMath:[['\\(','\\)'],['$','$']],displayMath:[['\\[','\\]'],['$$','$$']],tags:'ams'}};</script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;padding:40px 20px;line-height:1.9}.container{max-width:860px;margin:0 auto}h1{font-size:1.6rem;color:#f8fafc;margin-bottom:4px}.meta{color:#64748b;font-size:.88rem;margin-bottom:40px}.sol{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:24px 28px;margin:28px 0}.sol-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}.pnum{background:#059669;color:white;font-weight:700;font-size:.85rem;padding:3px 12px;border-radius:20px}.ptitle{font-size:1.05rem;color:#f1f5f9;font-weight:600}h3{color:#a5b4fc;font-size:.98rem;margin:20px 0 8px;border-left:3px solid #6366f1;padding-left:10px}p{color:#cbd5e1;margin-bottom:10px}.key{background:#0f172a;border:1px solid #6366f1;border-radius:6px;padding:14px 18px;margin:14px 0}.key strong{color:#818cf8}.nav{display:flex;justify-content:space-between;margin-top:48px}.btn{padding:10px 20px;border-radius:6px;text-decoration:none;font-size:.88rem;font-weight:600}.btn-back{background:#1e293b;color:#94a3b8;border:1px solid #475569}.btn-next{background:#6366f1;color:white}
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Level 3 解答 — 線形代数の物理応用</h1>
+  <p class="meta">★★★☆☆☆☆</p>
+
+  <!-- Sol 1 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 1</span><span class="ptitle">慣性テンソルの対角化と主軸</span></div>
+
+    <h3>（1）重心</h3>
+    <p>面積 \(S=ab/2\)。重心：\(x_G = a/3,\; y_G = b/3\)</p>
+
+    <h3>（2）原点周りの慣性テンソル</h3>
+    <p>面密度 \(\sigma = M/S = 2M/(ab)\)。積分領域 \(0\le x\le a,\;0\le y\le b(1-x/a)\)：</p>
+    \begin{align}
+    I_{xx}^{(0)} &= \sigma\int\!\!\int y^2\,dA = \sigma\int_0^a \frac{b^3}{3}\left(1-\frac{x}{a}\right)^3 dx = \sigma\cdot\frac{b^3}{3}\cdot\frac{a}{4} = \frac{Mb^2}{6}\\
+    I_{yy}^{(0)} &= \frac{Ma^2}{6}, \qquad I_{xy}^{(0)} = -\sigma\int\!\!\int xy\,dA = -\frac{Mab}{12}
+    \end{align}
+
+    <h3>（3）重心周り（平行軸定理）</h3>
+    \[I_{xx}^{(G)} = I_{xx}^{(0)} - My_G^2 = \frac{Mb^2}{6}-\frac{Mb^2}{9} = \frac{Mb^2}{18}\]
+    \[I_{yy}^{(G)} = \frac{Ma^2}{18}, \qquad I_{xy}^{(G)} = -\frac{Mab}{12}+\frac{Mab}{9} = \frac{Mab}{36}\]
+    \[I^{(G)} = \frac{M}{36}\begin{pmatrix}2b^2 & ab \\ ab & 2a^2\end{pmatrix}\]
+
+    <h3>（4）主慣性モーメント（\(a=b\) の正方形状の場合）</h3>
+    <p>\(a=b\) のとき：</p>
+    \[\lambda_\pm = \frac{M a^2}{36}(2\pm 1) \quad\Rightarrow\quad \lambda_+ = \frac{Ma^2}{12},\;\lambda_- = \frac{Ma^2}{36}\]
+    <p>主軸方向はそれぞれ \((1,1)/\sqrt{2}\)（斜め）と \((1,-1)/\sqrt{2}\)。</p>
+    <div class="key"><strong>物理的意味：</strong> 主軸方向が「最も慣性が小さい/大きい方向」。人工衛星はこの主軸周りに安定回転する。</div>
+  </div>
+
+  <!-- Sol 2 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 2</span><span class="ptitle">行列の指数関数と回転</span></div>
+
+    <h3>（1）べき乗のパターン</h3>
+    \[A^2 = \begin{pmatrix}-\omega^2&0\\0&-\omega^2\end{pmatrix} = -\omega^2 I,\quad A^3 = -\omega^2 A,\quad A^4 = \omega^4 I\]
+    <p>一般に：\(A^{2k}=(-1)^k\omega^{2k}I,\quad A^{2k+1}=(-1)^k\omega^{2k}A\)</p>
+
+    <h3>（2）行列指数関数</h3>
+    \begin{align}
+    e^{At} &= \sum_{k=0}^\infty\frac{(-1)^k\omega^{2k}t^{2k}}{(2k)!}I + \frac{1}{\omega}\sum_{k=0}^\infty\frac{(-1)^k\omega^{2k+1}t^{2k+1}}{(2k+1)!}A \\
+    &= \cos(\omega t)\,I + \frac{\sin(\omega t)}{\omega}\,A \\
+    &= \begin{pmatrix}\cos\omega t & -\sin\omega t\\\sin\omega t & \cos\omega t\end{pmatrix}\quad\checkmark
+    \end{align}
+
+    <h3>（3）物理的意味</h3>
+    \[\mathbf{x}(t) = e^{At}\begin{pmatrix}x_0\\0\end{pmatrix} = \begin{pmatrix}x_0\cos\omega t\\x_0\sin\omega t\end{pmatrix}\]
+    <p>半径 \(x_0\)、角速度 \(\omega\) の <strong>等速円運動</strong>。\(A\) は反時計回り回転の生成子。</p>
+
+    <h3>（4）固有分解</h3>
+    <p>固有値 \(\pm i\omega\)、固有ベクトル \(\mathbf{v}_\pm = (1, \mp i)^T/\sqrt{2}\)。</p>
+    \[A = P\begin{pmatrix}i\omega&0\\0&-i\omega\end{pmatrix}P^{-1} \;\Rightarrow\; e^{At} = P\begin{pmatrix}e^{i\omega t}&0\\0&e^{-i\omega t}\end{pmatrix}P^{-1}\]
+    <p>実部・虚部を分離すると同じ結果。</p>
+    <div class="key"><strong>Lie群との関係：</strong> \(e^{At}\) はSO(2)の元。\(A\) はそのLie代数 \(\mathfrak{so}(2)\) の元（生成子）。</div>
+  </div>
+
+  <!-- Sol 3 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 3</span><span class="ptitle">射影演算子とスペクトル分解</span></div>
+
+    <h3>（1）固有値・固有ベクトル</h3>
+    \[\det(H-\lambda I)=\lambda^2-5\lambda=0 \;\Rightarrow\; \lambda_1=0,\;\lambda_2=5\]
+    \[|\phi_1\rangle = \frac{1}{\sqrt{5}}\begin{pmatrix}2\\-1\end{pmatrix},\quad |\phi_2\rangle = \frac{1}{\sqrt{5}}\begin{pmatrix}1\\2\end{pmatrix}\]
+
+    <h3>（2）射影演算子</h3>
+    \[P_1 = \frac{1}{5}\begin{pmatrix}4&-2\\-2&1\end{pmatrix},\quad P_2 = \frac{1}{5}\begin{pmatrix}1&2\\2&4\end{pmatrix}\]
+
+    <h3>（3）性質の確認</h3>
+    \[P_1+P_2 = \frac{1}{5}\begin{pmatrix}5&0\\0&5\end{pmatrix} = I\;\checkmark,\quad P_1 P_2 = 0\;\checkmark\]
+    \[H = 0\cdot P_1 + 5\cdot P_2 = \begin{pmatrix}1&2\\2&4\end{pmatrix}\;\checkmark\]
+
+    <h3>（4）測定確率</h3>
+    \[\langle\phi_1|\psi\rangle = \frac{1}{\sqrt{5}}(2,\,-1)\begin{pmatrix}1\\0\end{pmatrix} = \frac{2}{\sqrt{5}}\]
+    \[P(\lambda_1) = \left|\frac{2}{\sqrt{5}}\right|^2 = \frac{4}{5}\]
+    <div class="key"><strong>Born則：</strong> 測定で \(\lambda_2=5\) が得られる確率は \(1/5\)。量子力学の基本原理。</div>
+  </div>
+
+  <!-- Sol 4 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 4</span><span class="ptitle">二次形式と安定性の判定</span></div>
+
+    <h3>（1）行列表示</h3>
+    \[K = \begin{pmatrix}3&1\\1&3\end{pmatrix}\]
+
+    <h3>（2）正定値判定</h3>
+    <p>第1主小行列式：\(3>0\)。第2主小行列式（行列式）：\(9-1=8>0\)。よって \(V\) は <strong>正定値</strong> → 平衡点は安定。</p>
+
+    <h3>（3）対角化</h3>
+    \[\det(K-\lambda I)=(\lambda-3)^2-1=0\;\Rightarrow\;\lambda_1=2,\;\lambda_2=4\]
+    <p>固有ベクトル：\(\mathbf{e}_1=\dfrac{1}{\sqrt{2}}(1,-1)^T\)，\(\mathbf{e}_2=\dfrac{1}{\sqrt{2}}(1,1)^T\)</p>
+    <p>正規座標 \(\xi_1=(q_1-q_2)/\sqrt{2},\;\xi_2=(q_1+q_2)/\sqrt{2}\) で：</p>
+    \[V = 2\xi_1^2 + 4\xi_2^2\]
+
+    <h3>（4）正規振動数</h3>
+    <p>運動方程式 \(\ddot\xi_i = -2\lambda_i\xi_i\)：</p>
+    \[\omega_1 = \sqrt{2\lambda_1} = 2,\quad \omega_2 = \sqrt{2\lambda_2} = 2\sqrt{2}\]
+    <div class="key"><strong>正規モードの意義：</strong> 正規座標系では運動方程式が完全に分離し、各 \(\xi_i\) が独立な調和振動子になる。分子の振動スペクトル解析の基礎。</div>
+  </div>
+
+  <div class="nav">
+    <a class="btn btn-back" href="level_03.html">← 問題に戻る</a>
+    <a class="btn btn-next" href="level_04.html">Level 4 →</a>
+  </div>
+</div>
+</body>
+</html>

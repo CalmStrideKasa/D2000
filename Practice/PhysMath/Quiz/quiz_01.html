@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Lv.1 — ベクトル解析</title>
+  <script>MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style']}}</script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;padding:20px 16px;line-height:1.7;min-height:100vh}
+    .header{max-width:520px;margin:0 auto 20px}
+    .title{font-size:1.1rem;color:#f8fafc;font-weight:700;margin-bottom:10px}
+    .prog-bar-wrap{background:#1e293b;border-radius:99px;height:6px;margin-bottom:6px}
+    .prog-bar{background:#6366f1;height:6px;border-radius:99px;transition:width 0.3s}
+    .prog-text{font-size:0.78rem;color:#64748b;text-align:right}
+    .card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;max-width:520px;margin:0 auto}
+    .qnum{display:inline-block;background:#6366f1;color:white;font-size:0.75rem;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:12px}
+    .qtext{color:#f1f5f9;font-size:0.97rem;margin-bottom:18px;line-height:1.8}
+    .opt{display:block;width:100%;text-align:left;background:#0f172a;border:1px solid #334155;color:#e2e8f0;padding:14px 16px;border-radius:8px;margin-bottom:10px;font-size:0.93rem;cursor:pointer;transition:border-color 0.15s,background 0.15s;line-height:1.6}
+    .opt:hover:not(:disabled){border-color:#6366f1;background:#1e293b}
+    .opt.correct{background:#064e3b;border-color:#10b981;color:#6ee7b7}
+    .opt.wrong{background:#450a0a;border-color:#ef4444;color:#fca5a5}
+    .opt:disabled{cursor:default}
+    .explain{display:none;background:#0f172a;border-left:3px solid #6366f1;border-radius:0 8px 8px 0;padding:14px 16px;margin-top:4px;font-size:0.88rem;color:#94a3b8;line-height:1.8}
+    .explain.show{display:block}
+    .explain strong{color:#818cf8}
+    .next-btn{display:none;width:100%;background:#6366f1;color:white;border:none;padding:14px;border-radius:8px;font-size:0.97rem;font-weight:600;cursor:pointer;margin-top:14px}
+    .next-btn.show{display:block}
+    .result{text-align:center;padding:32px 16px;max-width:520px;margin:0 auto}
+    .result h2{font-size:1.4rem;color:#f8fafc;margin-bottom:12px}
+    .score{font-size:3rem;font-weight:700;color:#6366f1;margin:16px 0}
+    .score span{font-size:1.2rem;color:#94a3b8}
+    .result p{color:#94a3b8;margin-bottom:24px}
+    .result-btns{display:flex;gap:10px;flex-direction:column}
+    .btn-retry{background:#6366f1;color:white;border:none;padding:14px;border-radius:8px;font-size:0.97rem;font-weight:600;cursor:pointer}
+    .btn-back{background:#1e293b;color:#94a3b8;border:1px solid #475569;padding:14px;border-radius:8px;font-size:0.97rem;font-weight:600;cursor:pointer;text-decoration:none;display:block;text-align:center}
+    .nav{max-width:520px;margin:16px auto 0;text-align:center}
+    .nav a{color:#64748b;font-size:0.82rem;text-decoration:none}
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="title">Lv.1 ベクトル解析</div>
+  <div class="prog-bar-wrap"><div class="prog-bar" id="bar" style="width:0%"></div></div>
+  <div class="prog-text" id="prog">0 / 10</div>
+</div>
+<div id="app"></div>
+<div class="nav"><a href="index.html">← クイズ一覧</a></div>
+
+<script>
+const Q = [
+  {
+    q: 'スカラー場 \\(\\phi = x^2y + yz^2\\) の点 \\(P=(1,\\,2,\\,-1)\\) における勾配 \\(\\nabla\\phi\\big|_P\\) はどれか？',
+    opts: ['\\((4,\\;2,\\;-4)\\)','\\((4,\\;2,\\;4)\\)','\\((2,\\;2,\\;-4)\\)','\\((4,\\;-2,\\;-4)\\)'],
+    ans: 0,
+    ex: '<strong>解法：</strong> 各成分を偏微分します。\\(\\frac{\\partial\\phi}{\\partial x}=2xy\\)、\\(\\frac{\\partial\\phi}{\\partial y}=x^2+z^2\\)、\\(\\frac{\\partial\\phi}{\\partial z}=2yz\\)。点\\(P=(1,2,-1)\\)を代入：\\(2(1)(2)=4\\)、\\(1+1=2\\)、\\(2(2)(-1)=-4\\)。よって \\(\\nabla\\phi|_P=(4,\\,2,\\,-4)\\)。'
+  },
+  {
+    q: '電場 \\(\\mathbf{E} = (2xz,\\,-y^2,\\,y^2z)\\) の発散 \\(\\nabla\\cdot\\mathbf{E}\\) はどれか？',
+    opts: ['\\(2z - 2y + y^2\\)','\\(2z + 2y + y^2\\)','\\(2z - 2y - y^2\\)','\\(z - 2y + y^2\\)'],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\(\\nabla\\cdot\\mathbf{E}=\\frac{\\partial(2xz)}{\\partial x}+\\frac{\\partial(-y^2)}{\\partial y}+\\frac{\\partial(y^2z)}{\\partial z}=2z+(-2y)+y^2=2z-2y+y^2\\)。各成分を独立に偏微分するだけです。'
+  },
+  {
+    q: 'ベクトル場 \\(\\mathbf{F} = (-y,\\,x,\\,0)\\) の回転 \\(\\nabla\\times\\mathbf{F}\\) はどれか？',
+    opts: ['\\((0,\\;0,\\;2)\\)','\\((0,\\;0,\\;0)\\)','\\((2,\\;0,\\;0)\\)','\\((0,\\;2,\\;0)\\)'],
+    ans: 0,
+    ex: '<strong>解法：</strong> 行列式展開で \\(z\\) 成分のみ非零。\\((\\nabla\\times\\mathbf{F})_z = \\frac{\\partial x}{\\partial x}-\\frac{\\partial(-y)}{\\partial y}=1-(-1)=2\\)。\\(x,y\\) 成分はともに0。これは角速度\\(\\omega=1\\)の剛体回転の速度場で、渦度 \\(\\nabla\\times\\mathbf{v}=2\\boldsymbol{\\omega}\\) の関係が成立します。'
+  },
+  {
+    q: 'Gaussの発散定理 \\(\\oiint_S \\mathbf{E}\\cdot d\\mathbf{S} = \\iiint_V \\nabla\\cdot\\mathbf{E}\\,dV\\) の正しい説明はどれか？',
+    opts: [
+      '閉曲面を通る電場のフラックスは、内部の発散の体積積分に等しい',
+      '閉曲線に沿う線積分は、内部の回転の面積積分に等しい',
+      '等ポテンシャル面に垂直な方向が場の最大変化方向である',
+      '真空中では\\(\\nabla^2\\phi=0\\)が成り立つ'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> Gaussの定理（発散定理）は「面積分 ← 体積積分」をつなぎます。選択肢2はStokesの定理（「線積分 ← 面積分」）の説明です。電磁気学では \\(\\nabla\\cdot\\mathbf{E}=\\rho/\\varepsilon_0\\) と組み合わせて電荷分布を求めるときに使います。'
+  },
+  {
+    q: 'スカラー場 \\(\\phi\\) の方向微分 \\(D_{\\hat{n}}\\phi\\) が最大になる方向はどれか？',
+    opts: [
+      '\\(\\nabla\\phi\\) の方向',
+      '\\(\\nabla\\phi\\) に垂直な方向',
+      '\\(\\nabla^2\\phi\\) の方向',
+      '\\(\\nabla\\times(\\nabla\\phi)\\) の方向'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\(D_{\\hat{n}}\\phi = \\nabla\\phi\\cdot\\hat{n} = |\\nabla\\phi|\\cos\\theta\\)。\\(\\cos\\theta\\) が最大（=1）になるのは \\(\\hat{n}\\) が \\(\\nabla\\phi\\) と同じ方向のとき。最大変化率の値は \\(|\\nabla\\phi|\\)。等ポテンシャル面（\\(\\phi=\\text{const}\\)）に垂直な方向でもあります。'
+  },
+  {
+    q: '重力ポテンシャル \\(\\phi = -GM/r\\)（\\(r>0\\)）の Laplacian \\(\\nabla^2\\phi\\) はどれか？',
+    opts: ['\\(0\\)','\\(GM/r^3\\)','\\(-2GM/r^3\\)','\\(GM/r^2\\)'],
+    ans: 0,
+    ex: '<strong>解法：</strong> 球対称関数のLaplacian公式 \\(\\nabla^2 f(r)=f\'\'(r)+\\frac{2}{r}f\'(r)\\) を使います。\\(f\'=GM/r^2\\)、\\(f\'\'=-2GM/r^3\\)。合わせると \\(-2GM/r^3+2GM/r^3=0\\)。つまり真空中（電荷のない場所）でLaplace方程式 \\(\\nabla^2\\phi=0\\) が成立します。'
+  },
+  {
+    q: 'ベクトル場 \\(\\mathbf{F}\\) が「保存力場」（ポテンシャルが存在する）であるための条件はどれか？',
+    opts: [
+      '\\(\\nabla\\times\\mathbf{F} = \\mathbf{0}\\)',
+      '\\(\\nabla\\cdot\\mathbf{F} = 0\\)',
+      '\\(\\nabla^2\\mathbf{F} = \\mathbf{0}\\)',
+      '\\(|\\mathbf{F}| = \\text{const}\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\(\\nabla\\times\\mathbf{F}=\\mathbf{0}\\)（非回転場・渦なし場）が必要十分条件です。この条件が満たされると \\(\\mathbf{F}=-\\nabla\\phi\\) となるスカラーポテンシャル \\(\\phi\\) が存在します。\\(\\nabla\\cdot\\mathbf{F}=0\\) は「湧き出しなし」（ソレノイダル）の条件で、別の性質です。'
+  },
+  {
+    q: 'Stokesの定理 \\(\\oint_C\\mathbf{F}\\cdot d\\mathbf{l} = \\iint_S(\\nabla\\times\\mathbf{F})\\cdot d\\mathbf{S}\\) の正しい説明はどれか？',
+    opts: [
+      '閉曲線の線積分 = その曲線を境界に持つ曲面上のrotの面積分',
+      '閉曲面の面積分 = 内部のdivの体積積分',
+      '面積分 = ポテンシャルの体積積分',
+      '線積分 = 内部の電荷の総量'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> Stokesは「線積分 → 面積分」をつなぎます。Gaussは「面積分 → 体積積分」です。\\(\\mathbf{F}=(-y,x,0)\\) の円周での線積分では \\(\\oint\\mathbf{F}\\cdot d\\mathbf{l}=2\\pi R^2\\)、rot の面積分でも \\(2\\pi R^2\\) が得られます（Level 1 問題3）。'
+  },
+  {
+    q: '\\(\\nabla^2(r^n)\\) を正しく表す式はどれか？（\\(r=\\sqrt{x^2+y^2+z^2}\\)）',
+    opts: [
+      '\\(n(n+1)\\,r^{n-2}\\)',
+      '\\(n(n-1)\\,r^{n-2}\\)',
+      '\\(n\\,r^{n-1}\\)',
+      '\\(n^2\\,r^{n-2}\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\(f(r)=r^n\\) に対し \\(f\'=nr^{n-1}\\)、\\(f\'\'=n(n-1)r^{n-2}\\)。球対称Laplacian公式を適用：\\(\\nabla^2(r^n)=n(n-1)r^{n-2}+\\frac{2}{r}\\cdot nr^{n-1}=n(n-1)r^{n-2}+2nr^{n-2}=n(n+1)r^{n-2}\\)。\\(n=-1\\) を代入すると \\((-1)(0)r^{-3}=0\\) となり、重力ポテンシャルの結果と一致します。'
+  },
+  {
+    q: 'Gaussの法則 \\(\\nabla\\cdot\\mathbf{E}=\\rho/\\varepsilon_0\\) を使って、\\(\\mathbf{E}=(2xz,-y^2,y^2z)\\) での点 \\((1,1,1)\\) における電荷密度 \\(\\rho\\) を求めよ。',
+    opts: [
+      '\\(\\varepsilon_0\\)',
+      '\\(2\\varepsilon_0\\)',
+      '\\(0\\)',
+      '\\(-\\varepsilon_0\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> まず \\(\\nabla\\cdot\\mathbf{E}=2z-2y+y^2\\)（問題2と同じ）。点\\((1,1,1)\\)を代入：\\(2(1)-2(1)+(1)^2=2-2+1=1\\)。よって \\(\\rho=\\varepsilon_0\\cdot 1=\\varepsilon_0\\)。Gaussの法則は発散の値から電荷密度を直接読み取れる便利な公式です。'
+  }
+];
+
+let cur = 0, score = 0, answered = false;
+
+function render() {
+  const q = Q[cur];
+  const pct = (cur / Q.length) * 100;
+  document.getElementById('bar').style.width = pct + '%';
+  document.getElementById('prog').textContent = cur + ' / ' + Q.length;
+
+  const optsHTML = q.opts.map((o, i) =>
+    `<button class="opt" onclick="choose(this,${i===q.ans})" id="opt${i}">${o}</button>`
+  ).join('');
+
+  document.getElementById('app').innerHTML =
+    `<div class="card">
+      <span class="qnum">問題 ${cur+1} / ${Q.length}</span>
+      <div class="qtext">${q.q}</div>
+      ${optsHTML}
+      <div class="explain" id="explain">📖 ${q.ex}</div>
+      <button class="next-btn" id="nxt" onclick="next()">${cur+1<Q.length ? '次の問題 →' : '結果を見る'}</button>
+    </div>`;
+
+  if (window.MathJax) MathJax.typesetPromise();
+  answered = false;
+}
+
+function choose(el, correct) {
+  if (answered) return;
+  answered = true;
+  document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+  if (correct) {
+    el.classList.add('correct');
+    score++;
+  } else {
+    el.classList.add('wrong');
+    const ai = Q[cur].ans;
+    document.getElementById('opt' + ai).classList.add('correct');
+  }
+  const ex = document.getElementById('explain');
+  ex.classList.add('show');
+  document.getElementById('nxt').classList.add('show');
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+function next() {
+  cur++;
+  if (cur >= Q.length) showResult();
+  else render();
+}
+
+function showResult() {
+  document.getElementById('bar').style.width = '100%';
+  document.getElementById('prog').textContent = Q.length + ' / ' + Q.length;
+  const pct = Math.round(score / Q.length * 100);
+  let msg = score === Q.length ? '完璧です！演習問題に挑戦しましょう 🎉' :
+            score >= 8 ? 'よくできました！少し復習して演習へ。' :
+            score >= 6 ? '基本は理解できています。苦手な問題を復習しましょう。' :
+            'Introduction のセクション1を読み直してから再挑戦しましょう。';
+  document.getElementById('app').innerHTML =
+    `<div class="result">
+      <h2>クイズ完了</h2>
+      <div class="score">${score}<span> / ${Q.length}</span></div>
+      <p>${msg}</p>
+      <div class="result-btns">
+        <button class="btn-retry" onclick="restart()">もう一度挑戦する</button>
+        <a class="btn-back" href="../level_01.html">Level 1 演習問題を解く →</a>
+        <a class="btn-back" href="index.html">クイズ一覧に戻る</a>
+      </div>
+    </div>`;
+}
+
+function restart() { cur = 0; score = 0; render(); }
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Level 6 — フーリエ解析・変分法</title>
+  <script>MathJax={tex:{inlineMath:[['\\(','\\)'],['$','$']],displayMath:[['\\[','\\]'],['$$','$$']],tags:'ams'}};</script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;padding:40px 20px;line-height:1.9}.container{max-width:860px;margin:0 auto}h1{font-size:1.6rem;color:#f8fafc;margin-bottom:4px}.meta{color:#64748b;font-size:.88rem;margin-bottom:40px}.problem{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:24px 28px;margin:28px 0}.problem-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}.pnum{background:#6366f1;color:white;font-weight:700;font-size:.85rem;padding:3px 12px;border-radius:20px}.ptitle{font-size:1.05rem;color:#f1f5f9;font-weight:600}.context{background:#0f172a;border-left:3px solid #6366f1;padding:10px 16px;margin-bottom:14px;font-size:.88rem;color:#94a3b8;border-radius:0 6px 6px 0}.hint{background:#0f172a;border:1px solid #f59e0b;border-radius:6px;padding:12px 16px;margin-top:14px;font-size:.87rem;color:#fcd34d}.hint strong{color:#fbbf24}p{color:#cbd5e1;margin-bottom:10px}h3{color:#94a3b8;font-size:.95rem;margin:16px 0 6px}.nav{display:flex;justify-content:space-between;margin-top:48px}.btn{padding:10px 20px;border-radius:6px;text-decoration:none;font-size:.88rem;font-weight:600}.btn-back{background:#1e293b;color:#94a3b8;border:1px solid #475569}.btn-ans{background:#6366f1;color:white}</style>
+</head>
+<body>
+<div class="container">
+  <h1>Level 6 ★★★★★★☆ — フーリエ解析・変分法</h1>
+  <p class="meta">テーマ: フーリエ変換・Parsevalの定理・Euler-Lagrange方程式・最小作用原理　|　Introductionのセクション4・5を参照</p>
+
+  <!-- P1 -->
+  <div class="problem">
+    <div class="problem-header"><span class="pnum">問題 1</span><span class="ptitle">フーリエ変換と Green 関数による ODE の解法</span></div>
+    <div class="context">物理的文脈：信号処理・分散関係・線形応答理論（Kubo公式の基礎）。</div>
+    <p>外力 \(f(t)\) で駆動される調和振動子：</p>
+    \[\ddot{x} + 2\gamma\dot{x} + \omega_0^2 x = \frac{f(t)}{m}\]
+    <h3>（1）</h3>
+    <p>両辺をフーリエ変換し（規約：\(\tilde{h}(\omega)=\int_{-\infty}^\infty h(t)e^{-i\omega t}dt\)）、\(\tilde{x}(\omega)\) を \(\tilde{f}(\omega)\) で表せ。</p>
+    <h3>（2）</h3>
+    <p>伝達関数（グリーン関数の周波数表示）\(\chi(\omega) = \tilde{x}(\omega)/\tilde{f}(\omega)\) を求め、その絶対値の二乗 \(|\chi(\omega)|^2\) を書け。</p>
+    <h3>（3）</h3>
+    <p>Parsevalの定理 \(\int_{-\infty}^\infty |x(t)|^2 dt = \dfrac{1}{2\pi}\int_{-\infty}^\infty|\tilde{x}(\omega)|^2 d\omega\) を使って、インパルス応答のエネルギー \(\int_{-\infty}^\infty|x(t)|^2 dt\) を \(\gamma, \omega_0, m\) で表せ（\(f(t)=\delta(t)\) の場合）。</p>
+    <p style="color:#94a3b8;font-size:.88rem;margin-top:8px">必要な積分：\(\displaystyle\int_{-\infty}^\infty\frac{d\omega}{(\omega_0^2-\omega^2)^2+4\gamma^2\omega^2} = \frac{\pi}{2\gamma\omega_0^2}\)</p>
+    <h3>（4）</h3>
+    <p>\(\omega_0 \gg \gamma\)（高Q系）の極限で \(|\chi(\omega)|^2\) を \(\omega=\omega_0\) 近傍で Lorentz 型に近似し、半値全幅（FWHM）を求めよ。</p>
+    <div class="hint"><strong>ヒント：</strong> (1) \(\tilde{\dot{x}} = i\omega\tilde{x}\)，\(\tilde{\ddot{x}} = -\omega^2\tilde{x}\)。</div>
+  </div>
+
+  <!-- P2 -->
+  <div class="problem">
+    <div class="problem-header"><span class="pnum">問題 2</span><span class="ptitle">フーリエ変換の性質とデルタ関数</span></div>
+    <div class="context">物理的文脈：量子力学の運動量表示・回折・不確定性原理の数学的根拠。</div>
+    <h3>（1）Gauss関数のフーリエ変換</h3>
+    <p>\(f(t) = e^{-t^2/(2\sigma^2)}\) のフーリエ変換 \(\tilde{f}(\omega)\) を計算し、\(\tilde{f}(\omega) = \sigma\sqrt{2\pi}\,e^{-\sigma^2\omega^2/2}\) を示せ。</p>
+    <p style="color:#94a3b8;font-size:.88rem;margin-top:4px">必要な積分：\(\displaystyle\int_{-\infty}^\infty e^{-at^2}dt = \sqrt{\pi/a}\)（\(a>0\)）</p>
+    <h3>（2）不確定性原理</h3>
+    <p>\(\Delta t = \sigma\)（時間領域の広がり）、\(\Delta\omega = 1/\sigma\)（周波数領域の広がり）であることを確認し、\(\Delta t\cdot\Delta\omega = 1\) を示せ。量子力学では \(\Delta x\cdot\Delta p \ge \hbar/2\) に対応することを述べよ。</p>
+    <h3>（3）畳み込み定理</h3>
+    <p>\((f*g)(t) = \int_{-\infty}^\infty f(\tau)g(t-\tau)d\tau\) の変換が \(\widetilde{f*g} = \tilde{f}\cdot\tilde{g}\) となることを示せ。</p>
+    <h3>（4）デルタ関数の表現</h3>
+    <p>\(\delta(t) = \dfrac{1}{2\pi}\int_{-\infty}^\infty e^{i\omega t}d\omega\) を、Gauss 関数の \(\sigma\to\infty\) 極限から導け。</p>
+    <div class="hint"><strong>ヒント：</strong> (1) 指数を平方完成：\(-t^2/(2\sigma^2)-i\omega t = -\dfrac{1}{2\sigma^2}(t+i\sigma^2\omega)^2 - \sigma^2\omega^2/2\)。</div>
+  </div>
+
+  <!-- P3 -->
+  <div class="problem">
+    <div class="problem-header"><span class="pnum">問題 3</span><span class="ptitle">Euler-Lagrange方程式と最小作用原理</span></div>
+    <div class="context">物理的文脈：解析力学の基礎 — Newton力学・相対論的力学・場の理論のすべての出発点。</div>
+    <h3>（1）最速降下曲線（Brachistochrone）</h3>
+    <p>高さ \(h\) から \((a,b)\) まで滑落する粒子の所要時間：</p>
+    \[T = \int_0^a \sqrt{\frac{1+y'^2}{2gy}}\,dx\]
+    <p>Euler-Lagrange方程式を導き、第1積分（\(y(1+y'^2)=c^2=\mathrm{const}\)）を示せ。</p>
+    <h3>（2）サイクロイドによる解</h3>
+    <p>パラメータ表示 \(x = R(\theta-\sin\theta),\; y = R(1-\cos\theta)\) がこの第1積分を満たすことを確認せよ。</p>
+    <h3>（3）変分問題の第2変分（安定性）</h3>
+    <p>最短距離問題（平坦空間上の測地線）の汎関数 \(I[y]=\int_a^b\sqrt{1+y'^2}\,dx\) に対し、E-L方程式を解いて \(y=\alpha x+\beta\)（直線）が解であることを示せ。</p>
+    <h3>（4）Noetherの定理（保存則との対応）</h3>
+    <p>Lagrangian \(L(q,\dot{q},t)\) が時間並進対称 \((\partial L/\partial t=0)\) であるとき、\(H = p\dot{q}-L\)（\(p=\partial L/\partial\dot{q}\)）が保存されることをE-L方程式から示せ。</p>
+    <div class="hint"><strong>ヒント：</strong> (1) \(F=\sqrt{(1+y'^2)/(2gy)}\) が \(x\) に陽に依存しないとき第1積分（Beltramiの恒等式）\(F - y'\partial F/\partial y' = c\) が使える。</div>
+  </div>
+
+  <!-- P4 -->
+  <div class="problem">
+    <div class="problem-header"><span class="pnum">問題 4</span><span class="ptitle">Lagrange形式と正準変換</span></div>
+    <div class="context">物理的文脈：Hamiltonian力学・正準変換・完全可積分系・量子化の準備。</div>
+    <h3>（1）二重振り子の運動方程式</h3>
+    <p>長さ \(l\)・質量 \(m\) の同一の振り子2本をつないだ二重振り子（微小振動近似）のLagrangian：</p>
+    \[L = \frac{ml^2}{2}(2\dot\theta_1^2 + \dot\theta_2^2 + 2\dot\theta_1\dot\theta_2\cos(\theta_1-\theta_2)) - mgl(2(1-\cos\theta_1)+(1-\cos\theta_2))\]
+    <p>微小振動 \((\theta_i\ll1)\) で近似してE-L方程式を導き、行列形式に書け。</p>
+    <h3>（2）正準変換の条件</h3>
+    <p>変換 \((q,p)\to(Q,P)\) が正準変換であるための条件（Poisson括弧の保存）：</p>
+    \[\{Q,P\}_{q,p} = 1, \quad\{Q,Q\}=\{P,P\}=0\]
+    <p>変換 \(Q=\log(p^{-1}\sin q),\; P=p\cos q\) が正準変換であることを確認せよ。</p>
+    <h3>（3）Hamilton-Jacobi方程式</h3>
+    <p>調和振動子 \(H=p^2/(2m)+m\omega^2 q^2/2\) に対してHamilton-Jacobi方程式：</p>
+    \[\frac{\partial S}{\partial t} + H\!\left(q,\frac{\partial S}{\partial q}\right) = 0\]
+    <p>\(S = W(q) - Et\) と分離し、\(W(q)\) を求めよ。得られた \(q(t)\) を書け。</p>
+    <div class="hint"><strong>ヒント：</strong> (3) \(\partial S/\partial q = \sqrt{2m(E-m\omega^2 q^2/2)}\) を積分する。</div>
+  </div>
+
+  <div class="nav">
+    <a class="btn btn-back" href="index.html">← 一覧</a>
+    <a class="btn btn-ans" href="level_06_answer.html">解答を見る →</a>
+  </div>
+</div>
+</body>
+</html>

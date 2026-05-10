@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Lv.7 — 相対論・量子・高度応用</title>
+  <script>MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style']}}</script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;padding:20px 16px;line-height:1.7;min-height:100vh}
+    .header{max-width:520px;margin:0 auto 20px}
+    .title{font-size:1.1rem;color:#f8fafc;font-weight:700;margin-bottom:10px}
+    .prog-bar-wrap{background:#1e293b;border-radius:99px;height:6px;margin-bottom:6px}
+    .prog-bar{background:#6366f1;height:6px;border-radius:99px;transition:width 0.3s}
+    .prog-text{font-size:0.78rem;color:#64748b;text-align:right}
+    .card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;max-width:520px;margin:0 auto}
+    .qnum{display:inline-block;background:#6366f1;color:white;font-size:0.75rem;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:12px}
+    .qtext{color:#f1f5f9;font-size:0.97rem;margin-bottom:18px;line-height:1.8}
+    .opt{display:block;width:100%;text-align:left;background:#0f172a;border:1px solid #334155;color:#e2e8f0;padding:14px 16px;border-radius:8px;margin-bottom:10px;font-size:0.93rem;cursor:pointer;transition:border-color 0.15s,background 0.15s;line-height:1.6}
+    .opt:hover:not(:disabled){border-color:#6366f1;background:#1e293b}
+    .opt.correct{background:#064e3b;border-color:#10b981;color:#6ee7b7}
+    .opt.wrong{background:#450a0a;border-color:#ef4444;color:#fca5a5}
+    .opt:disabled{cursor:default}
+    .explain{display:none;background:#0f172a;border-left:3px solid #6366f1;border-radius:0 8px 8px 0;padding:14px 16px;margin-top:4px;font-size:0.88rem;color:#94a3b8;line-height:1.8}
+    .explain.show{display:block}
+    .explain strong{color:#818cf8}
+    .next-btn{display:none;width:100%;background:#6366f1;color:white;border:none;padding:14px;border-radius:8px;font-size:0.97rem;font-weight:600;cursor:pointer;margin-top:14px}
+    .next-btn.show{display:block}
+    .result{text-align:center;padding:32px 16px;max-width:520px;margin:0 auto}
+    .result h2{font-size:1.4rem;color:#f8fafc;margin-bottom:12px}
+    .score{font-size:3rem;font-weight:700;color:#6366f1;margin:16px 0}
+    .score span{font-size:1.2rem;color:#94a3b8}
+    .result p{color:#94a3b8;margin-bottom:24px}
+    .result-btns{display:flex;gap:10px;flex-direction:column}
+    .btn-retry{background:#6366f1;color:white;border:none;padding:14px;border-radius:8px;font-size:0.97rem;font-weight:600;cursor:pointer}
+    .btn-back{background:#1e293b;color:#94a3b8;border:1px solid #475569;padding:14px;border-radius:8px;font-size:0.97rem;font-weight:600;cursor:pointer;text-decoration:none;display:block;text-align:center}
+    .nav{max-width:520px;margin:16px auto 0;text-align:center}
+    .nav a{color:#64748b;font-size:0.82rem;text-decoration:none}
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="title">Lv.7 相対論・量子・高度応用</div>
+  <div class="prog-bar-wrap"><div class="prog-bar" id="bar" style="width:0%"></div></div>
+  <div class="prog-text" id="prog">0 / 10</div>
+</div>
+<div id="app"></div>
+<div class="nav"><a href="index.html">← クイズ一覧</a></div>
+
+<script>
+const Q = [
+  {
+    q: 'Schwarzschild計量（質量 \\(M\\) の球対称時空）の \\(tt\\) 成分 \\(g_{tt}\\) はどれか？（\\(r_s=2GM/c^2\\)）',
+    opts: [
+      '\\(-(1-r_s/r)\\)',
+      '\\(+(1-r_s/r)\\)',
+      '\\(-(1+r_s/r)\\)',
+      '\\(-1\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> Schwarzschild計量：\\(ds^2=-(1-r_s/r)c^2dt^2+(1-r_s/r)^{-1}dr^2+r^2d\\Omega^2\\)。\\(g_{tt}=-(1-r_s/r)\\)。\\(r=r_s\\)（事象の地平線）で \\(g_{tt}=0\\)。\\(r\\to\\infty\\) では \\(g_{tt}\\to-1\\)（Minkowski計量に漸近）。'
+  },
+  {
+    q: '量子調和振動子の生成・消滅演算子 \\(a^\\dagger,a\\) の交換関係はどれか？',
+    opts: [
+      '\\([a,a^\\dagger]=1\\)',
+      '\\([a,a^\\dagger]=0\\)',
+      '\\([a,a^\\dagger]=i\\hbar\\)',
+      '\\(\\{a,a^\\dagger\\}=1\\)（反交換子）'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\(a=(m\\omega x+ip)/(\\sqrt{2m\\hbar\\omega})\\)、\\(a^\\dagger=(m\\omega x-ip)/(\\sqrt{2m\\hbar\\omega})\\)。\\([x,p]=i\\hbar\\) から \\([a,a^\\dagger]=1\\) が導かれます。ハミルトニアンは \\(H=\\hbar\\omega(a^\\dagger a+\\frac{1}{2})\\)、エネルギー固有値は \\(E_n=\\hbar\\omega(n+\\frac{1}{2})\\)。'
+  },
+  {
+    q: '生成演算子 \\(a^\\dagger\\) が固有状態 \\(|n\\rangle\\) に作用した結果はどれか？',
+    opts: [
+      '\\(a^\\dagger|n\\rangle=\\sqrt{n+1}\\,|n+1\\rangle\\)',
+      '\\(a^\\dagger|n\\rangle=|n+1\\rangle\\)',
+      '\\(a^\\dagger|n\\rangle=n|n+1\\rangle\\)',
+      '\\(a^\\dagger|n\\rangle=\\sqrt{n}\\,|n-1\\rangle\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\([a,a^\\dagger]=1\\) と \\(a^\\dagger a|n\\rangle=n|n\\rangle\\) から \\(a^\\dagger|n\\rangle\\propto|n+1\\rangle\\)。規格化のため係数 \\(\\sqrt{n+1}\\) が付きます。対称的に \\(a|n\\rangle=\\sqrt{n}|n-1\\rangle\\)。これらを使うと行列要素が一切積分なしで計算できます。'
+  },
+  {
+    q: 'コヒーレント状態 \\(|\\alpha\\rangle\\) の定義として正しいのはどれか？',
+    opts: [
+      '\\(a|\\alpha\\rangle=\\alpha|\\alpha\\rangle\\)（消滅演算子の固有状態）',
+      '\\(a^\\dagger|\\alpha\\rangle=\\alpha|\\alpha\\rangle\\)',
+      '\\(H|\\alpha\\rangle=\\alpha|\\alpha\\rangle\\)',
+      '\\(\\langle\\alpha|n\\rangle=0\\)（エネルギー固有状態と直交）'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> コヒーレント状態 \\(|\\alpha\\rangle\\)（\\(\\alpha\\in\\mathbb{C}\\)）は消滅演算子の固有状態。\\(|\\alpha\\rangle=e^{-|\\alpha|^2/2}\\sum_n\\frac{\\alpha^n}{\\sqrt{n!}}|n\\rangle\\) と展開できます。レーザー光の量子状態であり、不確定性関係を等号で達成する「最も古典的な」量子状態です。'
+  },
+  {
+    q: 'Riemann曲率テンソル \\(R^\\rho{}_{\\sigma\\mu\\nu}\\) のChristoffel記号による表現はどれか？',
+    opts: [
+      '\\(R^\\rho{}_{\\sigma\\mu\\nu}=\\partial_\\mu\\Gamma^\\rho_{\\nu\\sigma}-\\partial_\\nu\\Gamma^\\rho_{\\mu\\sigma}+\\Gamma^\\rho_{\\mu\\lambda}\\Gamma^\\lambda_{\\nu\\sigma}-\\Gamma^\\rho_{\\nu\\lambda}\\Gamma^\\lambda_{\\mu\\sigma}\\)',
+      '\\(R^\\rho{}_{\\sigma\\mu\\nu}=\\partial_\\mu\\Gamma^\\rho_{\\nu\\sigma}+\\partial_\\nu\\Gamma^\\rho_{\\mu\\sigma}\\)',
+      '\\(R^\\rho{}_{\\sigma\\mu\\nu}=\\Gamma^\\rho_{\\mu\\nu}-\\Gamma^\\rho_{\\nu\\mu}\\)',
+      '\\(R^\\rho{}_{\\sigma\\mu\\nu}=g^{\\rho\\lambda}(\\partial_\\mu g_{\\lambda\\nu}-\\partial_\\nu g_{\\lambda\\mu})\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> 曲率テンソルはChristoffel記号の微分と積から構成されます。平坦空間では \\(\\Gamma=0\\) なので \\(R=0\\)。Einstein方程式 \\(G_{\\mu\\nu}=8\\pi G T_{\\mu\\nu}/c^4\\) の左辺 \\(G_{\\mu\\nu}=R_{\\mu\\nu}-\\frac{1}{2}g_{\\mu\\nu}R\\) はこのRiemannテンソルから作られます。'
+  },
+  {
+    q: 'Poissonブラケット \\(\\{q,p\\}\\) の値はどれか？',
+    opts: [
+      '\\(1\\)',
+      '\\(0\\)',
+      '\\(i\\hbar\\)',
+      '\\(-1\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\(\\{q,p\\}=\\frac{\\partial q}{\\partial q}\\frac{\\partial p}{\\partial p}-\\frac{\\partial q}{\\partial p}\\frac{\\partial p}{\\partial q}=1\\cdot1-0\\cdot0=1\\)。量子化規則 \\(\\{A,B\\}_{\\rm cl}\\to\\frac{1}{i\\hbar}[\\hat{A},\\hat{B}]_{\\rm QM}\\) から \\([\\hat{q},\\hat{p}]=i\\hbar\\) が得られます（Diracの正準量子化）。'
+  },
+  {
+    q: 'ゲージ変換 \\(\\mathbf{A}\\to\\mathbf{A}+\\nabla\\chi\\)、\\(\\phi\\to\\phi-\\partial\\chi/\\partial t\\) で不変に保たれるのはどれか？',
+    opts: [
+      '電磁場 \\(\\mathbf{E}\\) と \\(\\mathbf{B}\\)',
+      'ベクトルポテンシャル \\(\\mathbf{A}\\)',
+      'スカラーポテンシャル \\(\\phi\\)',
+      '4元ポテンシャル \\(A^\\mu\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\(\\mathbf{B}=\\nabla\\times\\mathbf{A}\\) は \\(\\nabla\\times(\\nabla\\chi)=0\\) なのでゲージ変換で不変。\\(\\mathbf{E}=-\\nabla\\phi-\\partial\\mathbf{A}/\\partial t\\) も同様に不変。物理的に観測可能な量（\\(\\mathbf{E},\\mathbf{B}\\)）はゲージ不変でなければならず、これが量子電磁力学（QED）のゲージ原理の基礎です。'
+  },
+  {
+    q: 'Dirac方程式 \\((i\\hbar\\gamma^\\mu\\partial_\\mu-mc)\\psi=0\\) の特徴として正しいのはどれか？',
+    opts: [
+      '相対論的量子力学の方程式で、自動的にスピン1/2と反粒子を含む',
+      'スカラー場の非相対論的方程式',
+      'ゲージボソンを記述する方程式',
+      '重力場の方程式'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> Dirac方程式は特殊相対論と量子力学を組み合わせた方程式。\\(\\gamma^\\mu\\) は \\(4\\times4\\) 行列（Dirac行列）で、\\(\\{\\gamma^\\mu,\\gamma^\\nu\\}=2\\eta^{\\mu\\nu}\\) を満たします。正エネルギー解が電子、負エネルギー解が陽電子（反粒子）に対応し、電子のスピン1/2が自然に出てきます。'
+  },
+  {
+    q: '経路積分における分配関数 \\(Z=\\int\\mathcal{D}[q]\\,e^{iS[q]/\\hbar}\\) の \\(S[q]\\) は何か？',
+    opts: [
+      '作用（\\(S=\\int L\\,dt\\)、\\(L\\) はLagrangian）',
+      'ハミルトニアン \\(H\\)',
+      'エネルギー固有値の和',
+      '波動関数の2乗'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> Feynmanの経路積分：量子系は古典的な「一つの経路」ではなく、「すべての経路の重ね合わせ」を伝播します。各経路の寄与は \\(e^{iS/\\hbar}\\)（位相因子）。\\(\\hbar\\to0\\) の極限で位相が急激に振動し、定常位相近似から最小作用の経路（古典軌道）が選ばれます。'
+  },
+  {
+    q: 'Schwarzschildブラックホールの事象の地平線の半径（Schwarzschild半径）はどれか？',
+    opts: [
+      '\\(r_s = 2GM/c^2\\)',
+      '\\(r_s = GM/c^2\\)',
+      '\\(r_s = 4GM/c^2\\)',
+      '\\(r_s = GM/c\\)'
+    ],
+    ans: 0,
+    ex: '<strong>解法：</strong> \\(g_{tt}=0\\) となる \\(r\\) が事象の地平線、つまり \\(1-r_s/r=0\\) → \\(r=r_s=2GM/c^2\\)。太陽（\\(M_\\odot\\approx2\\times10^{30}\\)kg）なら \\(r_s\\approx3\\)km。地球なら約9mm。測地線方程式を解くと、光がこの半径内では脱出できないことが分かります（Level 7 問題1）。'
+  }
+];
+
+let cur = 0, score = 0, answered = false;
+
+function render() {
+  const q = Q[cur];
+  document.getElementById('bar').style.width = (cur / Q.length * 100) + '%';
+  document.getElementById('prog').textContent = cur + ' / ' + Q.length;
+  const optsHTML = q.opts.map((o, i) =>
+    `<button class="opt" onclick="choose(this,${i===q.ans})" id="opt${i}">${o}</button>`
+  ).join('');
+  document.getElementById('app').innerHTML =
+    `<div class="card">
+      <span class="qnum">問題 ${cur+1} / ${Q.length}</span>
+      <div class="qtext">${q.q}</div>
+      ${optsHTML}
+      <div class="explain" id="explain">📖 ${q.ex}</div>
+      <button class="next-btn" id="nxt" onclick="next()">${cur+1<Q.length?'次の問題 →':'結果を見る'}</button>
+    </div>`;
+  if (window.MathJax) MathJax.typesetPromise();
+  answered = false;
+}
+
+function choose(el, correct) {
+  if (answered) return;
+  answered = true;
+  document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+  if (correct) { el.classList.add('correct'); score++; }
+  else { el.classList.add('wrong'); document.getElementById('opt'+Q[cur].ans).classList.add('correct'); }
+  document.getElementById('explain').classList.add('show');
+  document.getElementById('nxt').classList.add('show');
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+function next() {
+  cur++;
+  if (cur >= Q.length) showResult();
+  else render();
+}
+
+function showResult() {
+  document.getElementById('bar').style.width = '100%';
+  document.getElementById('prog').textContent = Q.length + ' / ' + Q.length;
+  const msg = score===Q.length ? '全問正解！物理数学のマスターです 🎉' :
+              score>=8 ? 'よくできました！演習問題最終レベルに挑戦しましょう。' :
+              score>=6 ? '理解が進んでいます。難しい問題を復習しましょう。' :
+              'Level 5〜6の演習を復習してから再挑戦しましょう。';
+  document.getElementById('app').innerHTML =
+    `<div class="result">
+      <h2>クイズ完了</h2>
+      <div class="score">${score}<span> / ${Q.length}</span></div>
+      <p>${msg}</p>
+      <div class="result-btns">
+        <button class="btn-retry" onclick="restart()">もう一度挑戦する</button>
+        <a class="btn-back" href="../level_07.html">Level 7 演習問題を解く →</a>
+        <a class="btn-back" href="index.html">クイズ一覧に戻る</a>
+      </div>
+    </div>`;
+}
+
+function restart() { cur = 0; score = 0; render(); }
+render();
+</script>
+</body>
+</html>

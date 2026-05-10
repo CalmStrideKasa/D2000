@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Level 4 解答 — 偏微分方程式</title>
+  <script>MathJax={tex:{inlineMath:[['\\(','\\)'],['$','$']],displayMath:[['\\[','\\]'],['$$','$$']],tags:'ams'}};</script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;padding:40px 20px;line-height:1.9}.container{max-width:860px;margin:0 auto}h1{font-size:1.6rem;color:#f8fafc;margin-bottom:4px}.meta{color:#64748b;font-size:.88rem;margin-bottom:40px}.sol{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:24px 28px;margin:28px 0}.sol-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}.pnum{background:#059669;color:white;font-weight:700;font-size:.85rem;padding:3px 12px;border-radius:20px}.ptitle{font-size:1.05rem;color:#f1f5f9;font-weight:600}h3{color:#a5b4fc;font-size:.98rem;margin:20px 0 8px;border-left:3px solid #6366f1;padding-left:10px}p{color:#cbd5e1;margin-bottom:10px}.key{background:#0f172a;border:1px solid #6366f1;border-radius:6px;padding:14px 18px;margin:14px 0}.key strong{color:#818cf8}.nav{display:flex;justify-content:space-between;margin-top:48px}.btn{padding:10px 20px;border-radius:6px;text-decoration:none;font-size:.88rem;font-weight:600}.btn-back{background:#1e293b;color:#94a3b8;border:1px solid #475569}.btn-next{background:#6366f1;color:white}</style>
+</head>
+<body>
+<div class="container">
+  <h1>Level 4 解答 — 偏微分方程式</h1>
+  <p class="meta">★★★★☆☆☆</p>
+
+  <!-- Sol 1 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 1</span><span class="ptitle">波動方程式と固有モード展開</span></div>
+
+    <h3>（1）固有値・固有関数</h3>
+    <p>\(X''+\lambda X=0,\;X(0)=X(L)=0\) の解：</p>
+    \[\lambda_n = \left(\frac{n\pi}{L}\right)^2,\quad X_n(x)=\sin\frac{n\pi x}{L}\quad(n=1,2,3,\ldots)\]
+    <p>時間方程式 \(T''+\omega_n^2 T=0\)（\(\omega_n=cn\pi/L\)）の一般解 \(T_n = A_n\cos\omega_n t+B_n\sin\omega_n t\)。</p>
+
+    <h3>（2）一般解</h3>
+    \[u(x,t)=\sum_{n=1}^\infty\sin\frac{n\pi x}{L}\left(A_n\cos\omega_n t + B_n\sin\omega_n t\right)\]
+    \[A_n=\frac{2}{L}\int_0^L f(x)\sin\frac{n\pi x}{L}dx,\quad B_n=\frac{2}{n\pi c}\int_0^L g(x)\sin\frac{n\pi x}{L}dx\]
+
+    <h3>（3）特殊解 \(f=\sin(3\pi x/L),\;g=0\)</h3>
+    \[A_3=1,\;A_{n\ne3}=0,\;B_n=0 \;\Rightarrow\; u(x,t)=\sin\frac{3\pi x}{L}\cos\frac{3\pi c}{L}t\]
+    <p>3次固有モードの定在波（3つの腹）。</p>
+
+    <h3>（4）d'Alembert解</h3>
+    <p>\(\xi=x+ct,\;\eta=x-ct\) とすると \(\partial^2 u/\partial\xi\partial\eta=0\) より \(u=F(\xi)+G(\eta)\)。初期条件から：</p>
+    \[u(x,t)=\frac{f(x+ct)+f(x-ct)}{2}+\frac{1}{2c}\int_{x-ct}^{x+ct}g(s)ds\quad\checkmark\]
+    <div class="key"><strong>物理的意味：</strong> d'Alembert解は右進み波 \(F(x+ct)\) と左進み波 \(G(x-ct)\) の重ね合わせ。</div>
+  </div>
+
+  <!-- Sol 2 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 2</span><span class="ptitle">熱伝導方程式と拡散</span></div>
+
+    <h3>（1）特解</h3>
+    <p>\(T=X(x)\Theta(t)\) で \(X_n=\sin(n\pi x/L),\;\Theta_n=e^{-\kappa\lambda_n t}\)：</p>
+    \[T(x,t)=T_0 e^{-\kappa(\pi/L)^2 t}\sin\frac{\pi x}{L}\]
+
+    <h3>（2）一定初期条件のFourier展開</h3>
+    <p>奇数 \(n\) でのみ \(b_n = 4T_0/(n\pi)\)（偶数は \(b_n=0\)）：</p>
+    \[T(x,t) = \frac{4T_0}{\pi}\sum_{k=0}^\infty\frac{1}{2k+1}\sin\frac{(2k+1)\pi x}{L}\exp\!\left(-\kappa\left(\frac{(2k+1)\pi}{L}\right)^2 t\right)\]
+
+    <h3>（3）時定数と減衰速度</h3>
+    \[\tau_n = \frac{L^2}{\kappa n^2\pi^2}\]
+    <p>\(n=1\)（基本モード）が最も遅く減衰（\(\tau_1\) が最大）。\(t\gg\tau_1\) では基本モードのみ残る。</p>
+
+    <h3>（4）虚時間Schrödinger方程式との対応</h3>
+    <p>置換 \(t\to -i\hbar\tau\)（虚時間）で Schrödinger 方程式が熱方程式に変換される。これは経路積分量子化・有限温度量子場理論・密度行列の計算に使われる。</p>
+    <div class="key">\(\kappa\leftrightarrow\hbar/(2m)\)，エネルギー固有状態の「減衰率」が \(E_n\) に対応。</div>
+  </div>
+
+  <!-- Sol 3 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 3</span><span class="ptitle">Laplace方程式と静電ポテンシャル</span></div>
+
+    <h3>（1）変数分離</h3>
+    <p>\(X''+\mu^2 X=0,\;X(0)=X(a)=0\) より \(\mu_n=n\pi/a,\;X_n=\sin(n\pi x/a)\)。</p>
+    <p>\(Y''-\mu_n^2 Y=0\) の一般解 \(Y_n = A_n\sinh(\mu_n y)+B_n\cosh(\mu_n y)\)。</p>
+    <p>\(Y(0)=0\) から \(B_n=0\)。よって \(Y_n=A_n\sinh(\mu_n y)\)。</p>
+
+    <h3>（2）特解</h3>
+    <p>\(\phi(x,b)=V_0\sin(\pi x/a)\) との比較で \(n=1\) 項のみ：</p>
+    \[A_1\sinh\!\left(\frac{\pi b}{a}\right) = V_0 \;\Rightarrow\; \phi(x,y) = V_0\frac{\sinh(\pi y/a)}{\sinh(\pi b/a)}\sin\frac{\pi x}{a}\]
+
+    <h3>（3）一般解</h3>
+    \[\phi(x,y)=\sum_{n=1}^\infty C_n\frac{\sinh(n\pi y/a)}{\sinh(n\pi b/a)}\sin\frac{n\pi x}{a}\]
+    \[C_n = \frac{2}{a}\int_0^a V(x)\sin\frac{n\pi x}{a}dx\]
+    <div class="key"><strong>物理的意味：</strong> コンデンサ板間の電場分布、導体箱内の静電ポテンシャルなどに直接応用。</div>
+  </div>
+
+  <!-- Sol 4 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 4</span><span class="ptitle">無限深さの量子井戸とエネルギー準位</span></div>
+
+    <h3>（1）固有値</h3>
+    \[k_n=\frac{n\pi}{L},\quad E_n=\frac{\hbar^2 k_n^2}{2m}=\frac{n^2\pi^2\hbar^2}{2mL^2}\quad(n=1,2,3,\ldots)\]
+
+    <h3>（2）規格化固有関数</h3>
+    \[\psi_n(x)=\sqrt{\frac{2}{L}}\sin\frac{n\pi x}{L}\]
+
+    <h3>（3）直交性</h3>
+    \[\int_0^L\psi_m\psi_n\,dx = \frac{2}{L}\int_0^L\sin\frac{m\pi x}{L}\sin\frac{n\pi x}{L}dx = \delta_{mn}\quad\checkmark\]
+    （三角関数の直交性による）
+
+    <h3>（4）一般解</h3>
+    <p>展開係数：</p>
+    \[c_n = \int_0^L\psi_n(x)\cdot\sqrt{\frac{30}{L^5}}x(L-x)dx = \sqrt{\frac{60}{L}}\cdot\frac{2L^3}{n^3\pi^3}[1-(-1)^n]\]
+    <p>奇数 \(n\) のみ非零：\(c_n = \dfrac{4\sqrt{60}L^{1/2}}{n^3\pi^3}\)（\(n\) 奇数）</p>
+    \[\psi(x,t) = \sum_{n:\text{奇}}c_n\psi_n(x)e^{-iE_n t/\hbar}\]
+    <div class="key"><strong>物理的意味：</strong> \(n=1\) 項が支配的（\(c_1\) が最大）。\(n=1\) の寄与率は \(|c_1|^2/\sum_n|c_n|^2\approx 0.9986\)（99.86%）。</div>
+  </div>
+
+  <div class="nav">
+    <a class="btn btn-back" href="level_04.html">← 問題に戻る</a>
+    <a class="btn btn-next" href="level_05.html">Level 5 →</a>
+  </div>
+</div>
+</body>
+</html>

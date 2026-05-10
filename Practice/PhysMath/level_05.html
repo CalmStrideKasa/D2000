@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Level 5 — テンソル解析</title>
+  <script>MathJax={tex:{inlineMath:[['\\(','\\)'],['$','$']],displayMath:[['\\[','\\]'],['$$','$$']],tags:'ams'}};</script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;padding:40px 20px;line-height:1.9}.container{max-width:860px;margin:0 auto}h1{font-size:1.6rem;color:#f8fafc;margin-bottom:4px}.meta{color:#64748b;font-size:.88rem;margin-bottom:40px}.problem{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:24px 28px;margin:28px 0}.problem-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}.pnum{background:#6366f1;color:white;font-weight:700;font-size:.85rem;padding:3px 12px;border-radius:20px}.ptitle{font-size:1.05rem;color:#f1f5f9;font-weight:600}.context{background:#0f172a;border-left:3px solid #6366f1;padding:10px 16px;margin-bottom:14px;font-size:.88rem;color:#94a3b8;border-radius:0 6px 6px 0}.hint{background:#0f172a;border:1px solid #f59e0b;border-radius:6px;padding:12px 16px;margin-top:14px;font-size:.87rem;color:#fcd34d}.hint strong{color:#fbbf24}p{color:#cbd5e1;margin-bottom:10px}h3{color:#94a3b8;font-size:.95rem;margin:16px 0 6px}.nav{display:flex;justify-content:space-between;margin-top:48px}.btn{padding:10px 20px;border-radius:6px;text-decoration:none;font-size:.88rem;font-weight:600}.btn-back{background:#1e293b;color:#94a3b8;border:1px solid #475569}.btn-ans{background:#6366f1;color:white}</style>
+</head>
+<body>
+<div class="container">
+  <h1>Level 5 ★★★★★☆☆ — テンソル解析</h1>
+  <p class="meta">テーマ: テンソル変換・Levi-Civitaシンボル・電磁場テンソル・Christoffel記号　|　Introductionのセクション3〜6を参照</p>
+
+  <!-- P1 -->
+  <div class="problem">
+    <div class="problem-header"><span class="pnum">問題 1</span><span class="ptitle">Levi-Civitaシンボルとベクトル恒等式</span></div>
+    <div class="context">物理的文脈：電磁気学・流体力学のベクトル計算の体系化。</div>
+    <p>Einstein 縮約記法と \(\varepsilon_{ijk}\varepsilon^{ilm}=\delta^l_j\delta^m_k-\delta^m_j\delta^l_k\) を用いて答えよ。</p>
+    <h3>（1）</h3>
+    <p>恒等式 \((\mathbf{A}\times\mathbf{B})\times\mathbf{C} = \mathbf{B}(\mathbf{A}\cdot\mathbf{C})-\mathbf{A}(\mathbf{B}\cdot\mathbf{C})\)（BAC-CAB則）をインデックス記法で証明せよ。</p>
+    <h3>（2）</h3>
+    <p>微分演算子を含む恒等式 \(\nabla\times(\nabla\times\mathbf{F})=\nabla(\nabla\cdot\mathbf{F})-\nabla^2\mathbf{F}\) を \(\varepsilon_{ijk}\) を使って証明せよ。</p>
+    <h3>（3）</h3>
+    <p>電磁波の真空中の方程式 \(\nabla\times(\nabla\times\mathbf{E})=-\mu_0\varepsilon_0\partial^2\mathbf{E}/\partial t^2\) と \(\nabla\cdot\mathbf{E}=0\) から波動方程式 \(\nabla^2\mathbf{E}=\mu_0\varepsilon_0\partial^2\mathbf{E}/\partial t^2\) を導け。</p>
+    <div class="hint"><strong>ヒント：</strong> (1) \([(\mathbf{A}\times\mathbf{B})\times\mathbf{C}]^i = \varepsilon^{ijk}(\mathbf{A}\times\mathbf{B})_j C_k = \varepsilon^{ijk}\varepsilon_{jlm}A^l B^m C_k\) と展開し、\(\varepsilon^{ijk}\varepsilon_{jlm}=-\varepsilon^{ijk}\varepsilon_{lmj}\) を使う。</div>
+  </div>
+
+  <!-- P2 -->
+  <div class="problem">
+    <div class="problem-header"><span class="pnum">問題 2</span><span class="ptitle">電磁場テンソルとLorentz変換</span></div>
+    <div class="context">物理的文脈：特殊相対論における電磁場の共変形式。</div>
+    <p>Minkowski計量 \(\eta_{\mu\nu}=\mathrm{diag}(-1,+1,+1,+1)\) を用いる。\(x^\mu=(ct,x,y,z)\)。</p>
+    <h3>（1）</h3>
+    <p>電磁場テンソル \(F^{\mu\nu}=\partial^\mu A^\nu - \partial^\nu A^\mu\)（\(A^\mu=(\phi/c,\mathbf{A})\)）の成分を電場 \(\mathbf{E}\) と磁場 \(\mathbf{B}\) で表せ。</p>
+    \[F^{\mu\nu}=\begin{pmatrix}0 & -E_x/c & -E_y/c & -E_z/c\\ E_x/c & 0 & -B_z & B_y\\ E_y/c & B_z & 0 & -B_x\\ E_z/c & -B_y & B_x & 0\end{pmatrix}\]
+    が成り立つことを確認せよ。</p>
+    <h3>（2）</h3>
+    <p>Lorentz力の4元ベクトル形式 \(f^\mu = q F^{\mu\nu}u_\nu\)（\(u^\mu=\gamma(c,\mathbf{v})\) は4速度）から非相対論的極限 \(v\ll c\) での \(\mathbf{f}=q(\mathbf{E}+\mathbf{v}\times\mathbf{B})\) を再現せよ。</p>
+    <h3>（3）</h3>
+    <p>Lorentz変換（\(x\) 方向に速度 \(\beta c\)）のもとで \(\mathbf{E}'\) と \(\mathbf{B}'\) を \(\mathbf{E},\mathbf{B}\) で表せ。\(F'^{\mu\nu} = \Lambda^\mu{}_\alpha\Lambda^\nu{}_\beta F^{\alpha\beta}\) から導くこと。</p>
+    <div class="hint"><strong>ヒント：</strong> \(\Lambda^\mu{}_\nu = \mathrm{diag}(\gamma,-\gamma\beta,0,0;\,-\gamma\beta,\gamma,0,0;\,0,0,1,0;\,0,0,0,1)\) の形（\(xy\) 平面内のLorentzブースト）。</div>
+  </div>
+
+  <!-- P3 -->
+  <div class="problem">
+    <div class="problem-header"><span class="pnum">問題 3</span><span class="ptitle">曲線座標のChristoffel記号と測地線</span></div>
+    <div class="context">物理的文脈：一般相対論・曲面上の幾何学・曲線座標での運動方程式。</div>
+    <p>球面座標 \((r,\theta,\varphi)\) の計量テンソル：\(g_{ij} = \mathrm{diag}(1, r^2, r^2\sin^2\theta)\)</p>
+    <h3>（1）</h3>
+    <p>Christoffel記号 \(\Gamma^i_{jk}=\dfrac{1}{2}g^{il}(\partial_j g_{kl}+\partial_k g_{jl}-\partial_l g_{jk})\) を計算し、すべての非零成分を求めよ。</p>
+    <h3>（2）</h3>
+    <p>測地線方程式 \(\ddot{x}^i + \Gamma^i_{jk}\dot{x}^j\dot{x}^k = 0\) を球面座標で展開し、\(r=\mathrm{const}\) の場合の式（球面上の測地線）を書け。</p>
+    <h3>（3）</h3>
+    <p>速度ベクトルの共変微分を使い、球座標での加速度ベクトルの成分を求めよ。\(\theta\) 成分：\(a^\theta = \ddot\theta + \Gamma^\theta_{rr}(\dot r)^2 + 2\Gamma^\theta_{r\theta}\dot r\dot\theta + \Gamma^\theta_{\theta\theta}(\dot\theta)^2 + \Gamma^\theta_{\varphi\varphi}(\dot\varphi)^2\) を計算せよ。</p>
+    <div class="hint"><strong>ヒント：</strong> (1) 非零なもの：\(\Gamma^r_{\theta\theta}=-r\)，\(\Gamma^r_{\varphi\varphi}=-r\sin^2\theta\)，\(\Gamma^\theta_{r\theta}=\Gamma^\theta_{\theta r}=1/r\)，\(\Gamma^\theta_{\varphi\varphi}=-\sin\theta\cos\theta\)，\(\Gamma^\varphi_{r\varphi}=1/r\)，\(\Gamma^\varphi_{\theta\varphi}=\cot\theta\)。</div>
+  </div>
+
+  <!-- P4 -->
+  <div class="problem">
+    <div class="problem-header"><span class="pnum">問題 4</span><span class="ptitle">応力テンソルと平衡条件</span></div>
+    <div class="context">物理的文脈：連続体力学・弾性論・流体力学。</div>
+    <p>ある弾性体の応力テンソル（\(x,y,z\) 成分を \(1,2,3\) と書く）：</p>
+    \[\sigma_{ij} = \begin{pmatrix}10 & 5 & 0\\ 5 & 3 & 2\\ 0 & 2 & -1\end{pmatrix}\;\text{[MPa]}\]
+    <h3>（1）</h3>
+    <p>法線方向が \(\hat{n}=\dfrac{1}{\sqrt{2}}(1,1,0)^T\) の面に働くトラクションベクトル \(t_i = \sigma_{ij}n^j\) を求めよ。</p>
+    <h3>（2）</h3>
+    <p>トラクションの法線成分（法応力）と接線成分（せん断応力）を求めよ。</p>
+    <h3>（3）</h3>
+    <p>\(\sigma_{ij}\) の固有値（主応力）を求め、最大・最小主応力を求めよ（\(z\) 方向の固有値は \(\lambda_3=-1\) であることを用いてよい）。</p>
+    <h3>（4）</h3>
+    <p>Mohrの応力円の概念を用いて、最大せん断応力 \(\tau_{\max}=(\lambda_{\max}-\lambda_{\min})/2\) を求めよ。</p>
+    <div class="hint"><strong>ヒント：</strong> (3) \(z\) 独立で \(2\times2\) ブロックの固有値を求める。</div>
+  </div>
+
+  <div class="nav">
+    <a class="btn btn-back" href="index.html">← 一覧</a>
+    <a class="btn btn-ans" href="level_05_answer.html">解答を見る →</a>
+  </div>
+</div>
+</body>
+</html>

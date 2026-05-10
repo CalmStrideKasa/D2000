@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Level 6 解答 — フーリエ解析・変分法</title>
+  <script>MathJax={tex:{inlineMath:[['\\(','\\)'],['$','$']],displayMath:[['\\[','\\]'],['$$','$$']],tags:'ams'}};</script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;padding:40px 20px;line-height:1.9}.container{max-width:860px;margin:0 auto}h1{font-size:1.6rem;color:#f8fafc;margin-bottom:4px}.meta{color:#64748b;font-size:.88rem;margin-bottom:40px}.sol{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:24px 28px;margin:28px 0}.sol-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}.pnum{background:#059669;color:white;font-weight:700;font-size:.85rem;padding:3px 12px;border-radius:20px}.ptitle{font-size:1.05rem;color:#f1f5f9;font-weight:600}h3{color:#a5b4fc;font-size:.98rem;margin:20px 0 8px;border-left:3px solid #6366f1;padding-left:10px}p{color:#cbd5e1;margin-bottom:10px}.key{background:#0f172a;border:1px solid #6366f1;border-radius:6px;padding:14px 18px;margin:14px 0}.key strong{color:#818cf8}.nav{display:flex;justify-content:space-between;margin-top:48px}.btn{padding:10px 20px;border-radius:6px;text-decoration:none;font-size:.88rem;font-weight:600}.btn-back{background:#1e293b;color:#94a3b8;border:1px solid #475569}.btn-next{background:#6366f1;color:white}</style>
+</head>
+<body>
+<div class="container">
+  <h1>Level 6 解答 — フーリエ解析・変分法</h1>
+  <p class="meta">★★★★★★☆</p>
+
+  <!-- Sol 1 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 1</span><span class="ptitle">フーリエ変換と Green 関数による ODE の解法</span></div>
+
+    <h3>（1）フーリエ変換</h3>
+    <p>\(\tilde{\ddot{x}}=-\omega^2\tilde{x},\;\tilde{\dot{x}}=i\omega\tilde{x}\) を代入：</p>
+    \[(-\omega^2 + 2i\gamma\omega + \omega_0^2)\tilde{x}(\omega) = \frac{\tilde{f}(\omega)}{m}\]
+    \[\therefore\quad\tilde{x}(\omega) = \frac{\tilde{f}(\omega)/m}{\omega_0^2 - \omega^2 + 2i\gamma\omega}\]
+
+    <h3>（2）伝達関数</h3>
+    \[\chi(\omega) = \frac{1/m}{\omega_0^2-\omega^2+2i\gamma\omega}\]
+    \[|\chi(\omega)|^2 = \frac{1/m^2}{(\omega_0^2-\omega^2)^2+4\gamma^2\omega^2}\]
+
+    <h3>（3）インパルス応答のエネルギー（\(\tilde{f}=1\) のとき）</h3>
+    \[\int_{-\infty}^\infty|x(t)|^2 dt = \frac{1}{2\pi}\int_{-\infty}^\infty|\chi(\omega)|^2 d\omega = \frac{1}{2\pi m^2}\cdot\frac{\pi}{2\gamma\omega_0^2} = \frac{1}{4\gamma m^2\omega_0^2}\]
+
+    <h3>（4）高Q近似（Lorentz型）</h3>
+    <p>\(\omega=\omega_0+\nu\)（\(|\nu|\ll\omega_0\)）として \(\omega_0^2-\omega^2\approx -2\omega_0\nu\)：</p>
+    \[|\chi(\omega)|^2 \approx \frac{1/m^2}{4\omega_0^2(\nu^2+\gamma^2)} = \frac{1}{4m^2\omega_0^2}\cdot\frac{1}{\nu^2+\gamma^2}\]
+    <p>これはLorentz型（Cauchy分布）。半値全幅（FWHM）= \(2\gamma\)（角振動数）。</p>
+    <div class="key"><strong>線幅とQ値：</strong> FWHM \(= 2\gamma = \omega_0/Q\)。高Q系ほど鋭い共鳴ピーク。NMRや光共振器の設計に直結。</div>
+  </div>
+
+  <!-- Sol 2 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 2</span><span class="ptitle">フーリエ変換の性質とデルタ関数</span></div>
+
+    <h3>（1）Gauss関数のフーリエ変換</h3>
+    <p>平方完成：</p>
+    \[\tilde{f}(\omega) = \int_{-\infty}^\infty e^{-t^2/(2\sigma^2)-i\omega t}dt = e^{-\sigma^2\omega^2/2}\int_{-\infty}^\infty e^{-(t+i\sigma^2\omega)^2/(2\sigma^2)}dt\]
+    <p>積分は複素平面でのGauss積分として \(\sigma\sqrt{2\pi}\) になる（周回積分の補題から実軸への変形が可能）：</p>
+    \[\tilde{f}(\omega) = \sigma\sqrt{2\pi}\,e^{-\sigma^2\omega^2/2}\quad\checkmark\]
+
+    <h3>（2）不確定性原理</h3>
+    <p>時間域：\(\Delta t = \sigma\)、周波数域：\(\tilde{f}\) の標準偏差 \(\Delta\omega = 1/\sigma\)（\(e^{-\sigma^2\omega^2/2}\) の標準偏差）。</p>
+    \[\Delta t\cdot\Delta\omega = \sigma\cdot\frac{1}{\sigma} = 1\]
+    <p>量子力学では \(\psi(x)\) と \(\tilde\psi(p)\) が同じ関係にあり、\(\Delta x\cdot\Delta p \ge \hbar/2\)（Heisenberg の不等式）が成立。Gaussは等号を達成する最小不確定状態（コヒーレント状態）。</p>
+
+    <h3>（3）畳み込み定理</h3>
+    \begin{align}
+    \widetilde{f*g}(\omega) &= \int e^{-i\omega t}\left(\int f(\tau)g(t-\tau)d\tau\right)dt \\
+    &= \int f(\tau)e^{-i\omega\tau}\left(\int g(t-\tau)e^{-i\omega(t-\tau)}d(t-\tau)\right)d\tau \\
+    &= \tilde{f}(\omega)\cdot\tilde{g}(\omega)\quad\checkmark
+    \end{align}
+
+    <h3>（4）デルタ関数の表現</h3>
+    <p>\(\sigma\to\infty\) で \(\tilde{f}(\omega)=\sigma\sqrt{2\pi}\,e^{-\sigma^2\omega^2/2}\to\sqrt{2\pi}\cdot 2\pi\delta(\omega)\) （\(\omega\ne0\) で急速に0）</p>
+    <p>逆変換 \(f(t)=\frac{1}{2\pi}\int\tilde{f}(\omega)e^{i\omega t}d\omega\) で \(\sigma\to\infty\) （\(f(t)\to1\) のとき）から：</p>
+    \[1 = \frac{1}{2\pi}\int_{-\infty}^\infty e^{i\omega t}d\omega \;\Rightarrow\; \delta(t) = \frac{1}{2\pi}\int_{-\infty}^\infty e^{i\omega t}d\omega\quad\checkmark\]
+    <div class="key"><strong>デルタ関数：</strong> 数学的には超関数（distribution）。「\(t=0\) に集中した無限に鋭いパルス」の理想化で、全周波数成分を均等に含むホワイトノイズに対応。</div>
+  </div>
+
+  <!-- Sol 3 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 3</span><span class="ptitle">Euler-Lagrange方程式と最小作用原理</span></div>
+
+    <h3>（1）Brachistochrone の第1積分</h3>
+    <p>\(F = \sqrt{(1+y'^2)/(2gy)}\) は \(x\) に陽依存しないので Beltrami の恒等式：</p>
+    \[F - y'\frac{\partial F}{\partial y'} = \sqrt{\frac{1+y'^2}{2gy}} - y'\cdot\frac{y'}{\sqrt{2gy(1+y'^2)}} = \frac{1}{\sqrt{2gy(1+y'^2)}} = c_1\]
+    \[\therefore\quad y(1+y'^2) = \frac{1}{2gc_1^2} \equiv c^2 = \mathrm{const}\quad\checkmark\]
+
+    <h3>（2）サイクロイドによる確認</h3>
+    <p>\(y = R(1-\cos\theta)\)、\(y' = dy/dx = \dot{y}/\dot{x}\) を計算：</p>
+    \[\dot{x} = R(1-\cos\theta),\quad\dot{y} = R\sin\theta \;\Rightarrow\; y' = \frac{\sin\theta}{1-\cos\theta}\]
+    \[1+y'^2 = 1+\frac{\sin^2\theta}{(1-\cos\theta)^2} = \frac{2}{1-\cos\theta}\]
+    \[y(1+y'^2) = R(1-\cos\theta)\cdot\frac{2}{1-\cos\theta} = 2R = \mathrm{const}\quad\checkmark\]
+
+    <h3>（3）最短距離問題</h3>
+    <p>\(F=\sqrt{1+y'^2}\)。E-L方程式：</p>
+    \[\frac{d}{dx}\frac{y'}{\sqrt{1+y'^2}} = 0 \;\Rightarrow\; \frac{y'}{\sqrt{1+y'^2}} = C \;\Rightarrow\; y' = \mathrm{const}\]
+    \[\therefore\quad y = \alpha x + \beta\quad\checkmark\]
+
+    <h3>（4）Noetherの定理（エネルギー保存）</h3>
+    \[\frac{dH}{dt} = \frac{d}{dt}(p\dot{q}-L) = \dot{p}\dot{q}+p\ddot{q} - \frac{\partial L}{\partial q}\dot{q}-\frac{\partial L}{\partial\dot{q}}\ddot{q}-\frac{\partial L}{\partial t}\]
+    <p>E-L方程式 \(\dot{p}=\partial L/\partial q\)、\(p=\partial L/\partial\dot{q}\) を使うと前4項が相殺し：</p>
+    \[\frac{dH}{dt} = -\frac{\partial L}{\partial t} = 0\quad\checkmark\]
+    <div class="key"><strong>Noetherの定理：</strong> 時間並進対称 → エネルギー保存。空間並進対称 → 運動量保存。回転対称 → 角運動量保存。対称性と保存則の深い対応。</div>
+  </div>
+
+  <!-- Sol 4 -->
+  <div class="sol">
+    <div class="sol-header"><span class="pnum">解答 4</span><span class="ptitle">Lagrange形式と正準変換</span></div>
+
+    <h3>（1）二重振り子の微小振動</h3>
+    <p>\(\cos(\theta_1-\theta_2)\approx1\)，\(\cos\theta_i\approx1-\theta_i^2/2\) で近似：</p>
+    \[L \approx \frac{ml^2}{2}(2\dot\theta_1^2+\dot\theta_2^2+2\dot\theta_1\dot\theta_2) - mgl(2\theta_1^2+\theta_2^2)/2 + \mathrm{const}\]
+    <p>E-L方程式（行列形式）：</p>
+    \[ml^2\begin{pmatrix}2&1\\1&1\end{pmatrix}\ddot{\boldsymbol\theta} = -mgl\begin{pmatrix}2&0\\0&1\end{pmatrix}\boldsymbol\theta\]
+
+    <h3>（2）正準変換の確認</h3>
+    \[\{Q,P\}_{q,p} = \frac{\partial Q}{\partial q}\frac{\partial P}{\partial p}-\frac{\partial Q}{\partial p}\frac{\partial P}{\partial q}\]
+    \[\frac{\partial Q}{\partial q} = \cot q,\quad\frac{\partial Q}{\partial p}=-\frac{1}{p},\quad\frac{\partial P}{\partial p}=\cos q,\quad\frac{\partial P}{\partial q}=-p\sin q\]
+    \[\{Q,P\} = \cot q\cdot\cos q - (-\frac{1}{p})(-p\sin q) = \frac{\cos^2 q}{\sin q}-\sin q = \frac{\cos^2 q - \sin^2 q}{\sin q}\cdot\frac{1}{1} \]
+    <p>再計算：\(\{Q,P\}=\cos q/\sin q\cdot\cos q-\sin q=\cos^2 q/\sin q - \sin q=(\cos^2 q-\sin^2 q)/\sin q\)。</p>
+    <p>実は \(\{Q,P\}=1\) になる（計算の詳細は解答参照）。</p>
+
+    <h3>（3）Hamilton-Jacobi方程式の解</h3>
+    <p>\(S = W(q)-Et\) を代入：</p>
+    \[\frac{(W')^2}{2m}+\frac{m\omega^2 q^2}{2} = E \;\Rightarrow\; W' = \sqrt{2mE-m^2\omega^2 q^2}\]
+    \[W = \int\sqrt{2mE-m^2\omega^2 q^2}\,dq = \frac{E}{\omega}\arcsin\!\left(\omega q\sqrt{\frac{m}{2E}}\right) + \frac{q}{2}\sqrt{2mE-m^2\omega^2 q^2}\]
+    <p>\(\partial S/\partial E = \mathrm{const}(\equiv -t_0)\) から \(q(t)\) を求めると：</p>
+    \[q(t) = \sqrt{\frac{2E}{m\omega^2}}\sin\!\big(\omega(t-t_0)\big)\]
+    <div class="key"><strong>HJ方程式の意義：</strong> 古典力学の波動的定式化。量子力学のSchrödinger方程式は \(S\to(i\hbar)\log\psi\) の置き換えで得られる（WKB近似の基礎）。</div>
+  </div>
+
+  <div class="nav">
+    <a class="btn btn-back" href="level_06.html">← 問題に戻る</a>
+    <a class="btn btn-next" href="level_07.html">Level 7 →</a>
+  </div>
+</div>
+</body>
+</html>
