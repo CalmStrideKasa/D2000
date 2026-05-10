@@ -45,3 +45,21 @@ Music
 - While music is undoubtedly important in every part of the world, what constitutes music is a polarizing topic that continues to be the subject the debate.
 - For example, rap music drew a large amount of criticism when it first emerged due to its violent and aggresive lyrics and ufamiliar melody.
 - This kind of controversy commonly surrounds newer genres of music, as the perception of genres when they first emerge tends to be mixed, leading to delayed mainstream acceptance.
+
+Literature 
+- Until recently, all books and documents in wide circulation were accepted as literature and considered to habe artistic merit, particularly in Western Europe.
+- After the 18th century, the deinition was revised to refer to imaginative writing that appeals to respected academics on account of its superior or tremendous quality.
+- Although many famous and admired literary figures, such as Shakespeare and Arthur Conan Doyle, are European, there have been many well-known and important authors around the world who should not be ignored.
+- Infuential writers outside of Europe, such as Murasaki Shikibu and Sun Tzu, have had lasting impaccts on the development of culture and art both locally and on a global scale and are appreciated worldwide.
+
+Biography
+- Bigraphies usually narrate in detail a person's experience of events that hve occurred in their life and often include analyses of the subject's personality.
+- Information used for writing biograpies can be sourced from oral history, online articles, interviews, diaries, letters, and so forth.
+- On the other hand, autobiographies are compiled and written primarily based on interviews with the subjects, with minimal use of other sources.
+- Therefore, wile autobiographies an attract complaints for lacking accuracy and an objective perspective, they can be some of the most insightful and interesting books.
+
+Geography 
+- Contrary to popular belief, geography, not only involves the study of the Earth's surface but also encompasses the study of its inhabitants, cultures, climate, and phenomena such as natural desasters.
+- As geography weaves together several related but contrasting themes, to make this discipline more systematic and transparant, it is often split into two branchhes: physical geography and uman geography.
+- Physical geography, the study of the natural world, includes the examination of processes and spatial patterns that make up the atmosphere, soil, vegetation, water, the animal world, and landforms.
+- In human geography, on the other hand, human activity is of paramount importance. The field covers topics such as agricltural systems, urban systems, transportation, settlements, and the distribution and composition of populations.
