@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>500文暗記カード</title>
+<style>
+  :root {
+    --paper: #F7F4EC;
+    --ink: #2B2A28;
+    --ink-soft: #6B6559;
+    --line: #D8D2C2;
+    --accent: #3E5C4E;
+    --accent-soft: #E4EEE8;
+    --warn: #A65D3E;
+    --warn-soft: #F3E4DC;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 40px;
+  }
+  .wrap { width: 100%; max-width: 480px; }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 18px;
+  }
+  header h1 {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+  .overall-label {
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin: -14px 0 20px;
+  }
+  .count {
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .progress-track {
+    height: 4px;
+    background: var(--line);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.3s ease;
+  }
+  .card {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 40px 28px;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 18px;
+    box-shadow: 0 1px 2px rgba(43,42,40,0.04);
+    cursor: pointer;
+  }
+  .label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .jp {
+    font-size: 21px;
+    line-height: 1.6;
+    font-weight: 600;
+  }
+  .en {
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--accent);
+    font-weight: 600;
+    display: none;
+  }
+  .en.shown { display: block; }
+  .hint {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+  }
+  button {
+    flex: 1;
+    padding: 15px 8px;
+    border-radius: 10px;
+    border: none;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-again {
+    background: var(--warn-soft);
+    color: var(--warn);
+  }
+  .btn-good {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  .btn-reveal {
+    width: 100%;
+    background: var(--ink);
+    color: var(--paper);
+    margin-top: 22px;
+    padding: 14px;
+    border-radius: 10px;
+  }
+  .done {
+    text-align: center;
+    padding: 60px 20px;
+  }
+  .done h2 { font-size: 19px; margin-bottom: 8px; }
+  .done p { color: var(--ink-soft); font-size: 14px; }
+  .footer-note {
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 22px;
+    line-height: 1.6;
+  }
+  .status-row {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+  .dot-new { background: var(--ink-soft); }
+  .dot-again { background: var(--warn); }
+  .dot-good { background: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>500文暗記カード</h1>
+    <span class="count" id="masteredLabel">習得済み -- / 500</span>
+  </header>
+
+  <div id="cardArea"></div>
+
+  <p class="footer-note">日本語を見て英語が言えたら「言えた」、言えなかったら「もう一度」を押してください。ダウンロードしてスマホやPCで直接開けば、ネット接続なしで使え、進捗は保存されます。</p>
+</div>
+
+<script>
+const SENTENCES = [
+["今日は何をする予定ですか？","What are you planning to do today?"],
+["私は毎朝6時に起きます。","I get up at six every morning."],
+["彼女はいつも時間通りに来ます。","She always comes on time."],
+["少し急いでもらえますか？","Could you hurry up a little?"],
+["今日は仕事が忙しかったです。","I was busy with work today."],
+["週末は何をして過ごしましたか？","What did you do over the weekend?"],
+["私はコーヒーを飲みながら新聞を読みます。","I read the newspaper while drinking coffee."],
+["彼は先週、新しい仕事を始めました。","He started a new job last week."],
+["明日は雨が降るかもしれません。","It might rain tomorrow."],
+["もう少しゆっくり話してもらえますか？","Could you speak a little more slowly?"],
+["私は毎日30分運動しています。","I exercise for thirty minutes every day."],
+["彼女は英語をとても上手に話します。","She speaks English very well."],
+["今夜は早く寝るつもりです。","I'm going to go to bed early tonight."],
+["彼らは来月引っ越す予定です。","They are planning to move next month."],
+["すみません、道に迷ってしまいました。","Excuse me, I've gotten lost."],
+["最寄りの駅はどこですか？","Where is the nearest station?"],
+["私はこの近くに住んでいます。","I live near here."],
+["今日は少し疲れています。","I'm a little tired today."],
+["彼はいつも遅刻します。","He is always late."],
+["そのニュースを聞いて驚きました。","I was surprised to hear that news."],
+["彼女は毎晩日記を書いています。","She writes in her diary every night."],
+["私たちは久しぶりに会いました。","We met for the first time in a while."],
+["今日の天気はとても良いですね。","The weather is very nice today."],
+["私は朝食を抜くことが多いです。","I often skip breakfast."],
+["彼は仕事が終わったらすぐ帰ります。","He goes home right after work."],
+["その映画はもう見ましたか？","Have you seen that movie yet?"],
+["私はまだその本を読み終えていません。","I haven't finished reading that book yet."],
+["彼女は来週、出張に行きます。","She is going on a business trip next week."],
+["私はその話を信じられませんでした。","I couldn't believe that story."],
+["そろそろ出発した方がいいと思います。","I think we should leave soon."],
+["彼は約束を守る人です。","He is a person who keeps his promises."],
+["私は毎日日記をつけるようにしています。","I try to keep a diary every day."],
+["その店は9時に開きます。","That store opens at nine."],
+["私は少し早く着きすぎました。","I arrived a little too early."],
+["彼女はいつも笑顔で挨拶してくれます。","She always greets me with a smile."],
+["今日は予定より遅れています。","We are behind schedule today."],
+["私はその件について後で連絡します。","I will contact you about that later."],
+["彼はまだ準備ができていません。","He isn't ready yet."],
+["私たちは同じ大学に通っていました。","We went to the same university."],
+["彼女は最近、料理を習い始めました。","She recently started learning to cook."],
+["私はその意見に賛成です。","I agree with that opinion."],
+["彼はいつも前向きに考えます。","He always thinks positively."],
+["私は少し風邪気味です。","I have a slight cold."],
+["彼女はその知らせを聞いて喜びました。","She was glad to hear the news."],
+["私たちはもっと早く出発するべきでした。","We should have left earlier."],
+["その件については後で話しましょう。","Let's talk about that later."],
+["彼は毎朝ジョギングをしています。","He goes jogging every morning."],
+["私はその場所に行ったことがありません。","I have never been to that place."],
+["彼女はいつも冷静に対応します。","She always handles things calmly."],
+["今日はいつもより早く帰れそうです。","I think I can go home earlier than usual today."],
+["この資料を今日中に仕上げてもらえますか？","Could you finish this document by the end of today?"],
+["会議は午後3時から始まります。","The meeting starts at three in the afternoon."],
+["彼は部長に昇進しました。","He was promoted to manager."],
+["このプロジェクトの締め切りはいつですか？","When is the deadline for this project?"],
+["彼女は会議で良い提案をしました。","She made a good proposal at the meeting."],
+["私はその件について上司に相談します。","I will consult my boss about that matter."],
+["今日は残業しなければなりません。","I have to work overtime today."],
+["彼はいつも締め切りを守ります。","He always meets deadlines."],
+["その契約はまだ結ばれていません。","The contract hasn't been signed yet."],
+["私たちはその案を採用することにしました。","We decided to adopt that plan."],
+["彼女は新しいチームに配属されました。","She was assigned to a new team."],
+["私はメールの返信を忘れていました。","I forgot to reply to the email."],
+["その報告書にはいくつかの誤りがあります。","There are some errors in that report."],
+["彼は会議に遅れて到着しました。","He arrived late for the meeting."],
+["私たちは来月、新製品を発表します。","We will launch a new product next month."],
+["彼女は仕事に対してとても責任感があります。","She is very responsible about her work."],
+["この件は私が担当します。","I will be in charge of this matter."],
+["彼はクライアントとの交渉が得意です。","He is good at negotiating with clients."],
+["私はその提案に反対です。","I am against that proposal."],
+["今週は会議が多くて大変です。","This week is tough because of many meetings."],
+["彼女は予算を管理する役割を担っています。","She is responsible for managing the budget."],
+["その計画は予定より遅れています。","That plan is behind schedule."],
+["私は明日、プレゼンをする予定です。","I am going to give a presentation tomorrow."],
+["彼は仕事を効率よく進めます。","He works efficiently."],
+["私たちはその問題を解決する必要があります。","We need to solve that problem."],
+["彼女は同僚からとても信頼されています。","She is trusted very much by her colleagues."],
+["このデータを分析してもらえますか？","Could you analyze this data?"],
+["私は転職を考えています。","I am thinking about changing jobs."],
+["彼はチームをうまくまとめています。","He manages the team well."],
+["その会社は業績を伸ばしています。","That company is growing its business."],
+["私は今、人手不足に悩んでいます。","I am struggling with a staff shortage right now."],
+["彼女は在宅勤務をしています。","She works from home."],
+["私たちはその件について合意しました。","We reached an agreement on that matter."],
+["彼はいつも冷静に問題に対処します。","He always deals with problems calmly."],
+["今日の会議は予定より長引きました。","Today's meeting ran longer than scheduled."],
+["私はその案件を至急対応します。","I will handle that matter urgently."],
+["彼女は上司に評価されています。","She is highly regarded by her boss."],
+["私たちの会社は海外に支店があります。","Our company has branches overseas."],
+["その企画は却下されました。","That plan was rejected."],
+["私は新入社員の研修を担当しています。","I am in charge of training new employees."],
+["彼はいつも締切ぎりぎりに提出します。","He always submits things right at the deadline."],
+["私たちはその市場に参入する予定です。","We plan to enter that market."],
+["彼女は複数のプロジェクトを同時に進めています。","She is working on several projects at the same time."],
+["私はその会議に出席できません。","I can't attend that meeting."],
+["彼はよく残業しています。","He often works overtime."],
+["私たちは人員を増やす必要があります。","We need to increase our staff."],
+["その提案は取締役会で承認されました。","That proposal was approved by the board."],
+["私は今日、有給休暇を取ります。","I am taking paid leave today."],
+["彼女はその仕事に向いていると思います。","I think she is suited for that job."],
+["私たちはお互いに協力し合う必要があります。","We need to cooperate with each other."],
+["これはいくらですか？","How much is this?"],
+["もっと安いものはありますか？","Do you have anything cheaper?"],
+["このシャツは私には少し大きいです。","This shirt is a little too big for me."],
+["これを試着してもいいですか？","Can I try this on?"],
+["セールはいつまでですか？","Until when is the sale?"],
+["返品はできますか？","Can I return this?"],
+["これを2つください。","I'll take two of these."],
+["クレジットカードは使えますか？","Can I use a credit card?"],
+["これは今、割引になっていますか？","Is this on sale right now?"],
+["もう少し小さいサイズはありますか？","Do you have a smaller size?"],
+["このバッグは人気があります。","This bag is popular."],
+["私はその値段に納得できません。","I'm not convinced by that price."],
+["彼女はいつもセール品を探しています。","She is always looking for sale items."],
+["私は先月、新しい財布を買いました。","I bought a new wallet last month."],
+["その店は今日休みです。","That store is closed today."],
+["このコートは思ったより高かったです。","This coat was more expensive than I expected."],
+["私はネットで買い物をすることが多いです。","I often shop online."],
+["彼はいつも現金で支払います。","He always pays in cash."],
+["このお店は品揃えが良いです。","This store has a good selection."],
+["私はその商品をオンラインで注文しました。","I ordered that item online."],
+["レシートはありますか？","Do you have the receipt?"],
+["私は予算を超えてしまいました。","I went over my budget."],
+["彼女はブランド品にはあまり興味がありません。","She isn't very interested in brand-name goods."],
+["このジャケットは色違いがありますか？","Does this jacket come in other colors?"],
+["私はその靴が気に入りました。","I liked those shoes."],
+["支払いは分割にできますか？","Can I pay in installments?"],
+["彼はいつも値段を比較してから買います。","He always compares prices before buying."],
+["私はその商品が届くのを待っています。","I'm waiting for that item to arrive."],
+["これはギフト用に包装してもらえますか？","Could you wrap this as a gift?"],
+["私は無駄遣いをしないようにしています。","I try not to waste money."],
+["そのお店は最近リニューアルしました。","That store was recently renovated."],
+["私は毎月、貯金をするようにしています。","I try to save money every month."],
+["彼女はいつも予算内で買い物をします。","She always shops within her budget."],
+["このテレビは保証期間内です。","This TV is still under warranty."],
+["私はその値引き交渉に成功しました。","I succeeded in negotiating a discount."],
+["彼はネットショッピングにはまっています。","He is into online shopping."],
+["このカバンは軽くて使いやすいです。","This bag is light and easy to use."],
+["私は先週、家電を買い替えました。","I replaced my home appliance last week."],
+["彼女はポイントカードを集めています。","She collects point cards."],
+["このズボンの丈を直してもらえますか？","Could you alter the length of these pants?"],
+["私は無駄なものを買わないようにしています。","I try not to buy unnecessary things."],
+["その値段は少し高すぎると思います。","I think that price is a little too high."],
+["私は来月、新しいパソコンを買う予定です。","I'm planning to buy a new computer next month."],
+["彼はいつもポイントを貯めています。","He always saves up points."],
+["このお店は現金のみ対応です。","This store only accepts cash."],
+["私はその商品を返品したいです。","I would like to return this item."],
+["彼女は毎週、スーパーで食材をまとめ買いします。","She buys groceries in bulk at the supermarket every week."],
+["このサイズはもう売り切れています。","This size is already sold out."],
+["私はネットで注文をキャンセルしました。","I canceled my order online."],
+["それは私の予算内に収まっています。","That is within my budget."],
+["この電車は新宿に止まりますか？","Does this train stop at Shinjuku?"],
+["空港までどれくらいかかりますか？","How long does it take to get to the airport?"],
+["次の便はいつ出発しますか？","When does the next flight depart?"],
+["このバスは駅前を通りますか？","Does this bus pass by the station?"],
+["チケットはどこで買えますか？","Where can I buy a ticket?"],
+["乗り換えはどこですればいいですか？","Where should I transfer?"],
+["このホテルは駅から近いですか？","Is this hotel close to the station?"],
+["荷物を預けたいのですが。","I'd like to check my luggage."],
+["この道をまっすぐ行けばいいですか？","Should I just go straight down this road?"],
+["チェックインは何時からできますか？","From what time can I check in?"],
+["私は来月、海外旅行に行く予定です。","I'm planning to travel abroad next month."],
+["彼は初めて日本を訪れました。","He visited Japan for the first time."],
+["このパスポートはまだ有効ですか？","Is this passport still valid?"],
+["両替はどこでできますか？","Where can I exchange money?"],
+["私は飛行機の中でよく眠れませんでした。","I couldn't sleep well on the plane."],
+["このツアーには何が含まれていますか？","What is included in this tour?"],
+["彼女は一人旅が好きです。","She likes traveling alone."],
+["私たちは道に迷ってしまいました。","We got lost."],
+["このエリアは観光客に人気です。","This area is popular with tourists."],
+["タクシーを呼んでもらえますか？","Could you call a taxi for me?"],
+["私は現地の料理を試してみたいです。","I'd like to try the local food."],
+["この便は遅れているようです。","This flight seems to be delayed."],
+["私は窓側の席を希望します。","I would like a window seat."],
+["彼はその国の文化にとても興味があります。","He is very interested in that country's culture."],
+["このガイドブックはとても役に立ちました。","This guidebook was very helpful."],
+["私は現地でレンタカーを借りるつもりです。","I'm planning to rent a car locally."],
+["その観光地は思ったより混んでいました。","That tourist spot was more crowded than I expected."],
+["私はまだ時差ぼけが残っています。","I still have jet lag."],
+["このホテルの部屋はとても静かです。","This hotel room is very quiet."],
+["私たちは予定より早く空港に着きました。","We arrived at the airport earlier than planned."],
+["彼女は毎年家族で旅行に行きます。","She goes on a trip with her family every year."],
+["この国では英語がよく通じます。","English is widely understood in this country."],
+["私は写真をたくさん撮りました。","I took a lot of photos."],
+["そのホテルは眺めがとても良かったです。","That hotel had a very nice view."],
+["私は次の目的地に向かいます。","I'm heading to the next destination."],
+["このバスは何分おきに来ますか？","How often does this bus come?"],
+["私は現地の人と友達になりました。","I made friends with a local person."],
+["この街は歩いて観光するのに向いています。","This town is good for sightseeing on foot."],
+["彼は旅行の計画を立てるのが得意です。","He is good at planning trips."],
+["私たちは予約なしでレストランに入りました。","We went into the restaurant without a reservation."],
+["この橋は町のシンボルになっています。","This bridge has become a symbol of the town."],
+["私は帰りの便を変更しました。","I changed my return flight."],
+["彼女は荷物を軽くまとめるのが上手です。","She is good at packing light."],
+["私はその国の言葉を少し勉強しました。","I studied a little of that country's language."],
+["このエリアは夜、静かになります。","This area becomes quiet at night."],
+["私たちは現地時間に合わせて行動しました。","We acted according to the local time."],
+["このホテルは朝食が評判です。","This hotel is known for its breakfast."],
+["私は次の旅行先をまだ決めていません。","I haven't decided on my next travel destination yet."],
+["彼はいつも軽装で旅行します。","He always travels light."],
+["このルートの方が早く着くと思います。","I think this route will get us there faster."],
+["最近、体調はいかがですか？","How have you been feeling lately?"],
+["私は昨日から頭痛がします。","I've had a headache since yesterday."],
+["彼は風邪をひいて寝込んでいます。","He has a cold and is lying in bed."],
+["病院に行った方がいいと思います。","I think you should go to the hospital."],
+["私はしばらく休んだ方がいいかもしれません。","I might need to rest for a while."],
+["彼女は毎日薬を飲んでいます。","She takes medicine every day."],
+["私は最近、よく眠れません。","I haven't been sleeping well lately."],
+["彼はストレスを抱えているようです。","He seems to be under stress."],
+["私は定期的に健康診断を受けています。","I get a health checkup regularly."],
+["彼女は最近、体重が減りました。","She has lost weight recently."],
+["私は少し熱があります。","I have a slight fever."],
+["彼はジムに通い始めました。","He started going to the gym."],
+["私は毎朝ストレッチをしています。","I stretch every morning."],
+["彼女は野菜をたくさん食べるようにしています。","She tries to eat a lot of vegetables."],
+["私は最近、腰が痛いです。","My lower back hurts lately."],
+["彼はタバコをやめようとしています。","He is trying to quit smoking."],
+["私は十分な睡眠をとるようにしています。","I try to get enough sleep."],
+["彼女はアレルギーがあります。","She has allergies."],
+["私はその薬を飲んでから調子が良くなりました。","I've felt better since I started taking that medicine."],
+["彼は毎年インフルエンザの予防接種を受けます。","He gets a flu shot every year."],
+["私は最近、運動不足だと感じています。","I feel like I haven't been exercising enough lately."],
+["彼女は目が疲れやすいです。","Her eyes get tired easily."],
+["私は水を十分に飲むようにしています。","I try to drink enough water."],
+["彼は最近、顔色が悪いです。","He looks pale lately."],
+["私は歯医者に予約を入れました。","I made an appointment with the dentist."],
+["彼女は肩がこっていると言っていました。","She said her shoulders were stiff."],
+["私はその怪我からもう回復しました。","I have already recovered from that injury."],
+["彼は病院で検査を受けました。","He had a checkup at the hospital."],
+["私は毎日決まった時間に食事をとるようにしています。","I try to eat meals at fixed times every day."],
+["彼女はストレス発散のために運動しています。","She exercises to relieve stress."],
+["私はその薬の副作用が心配です。","I'm worried about the side effects of that medicine."],
+["彼はよく眠れるようになりました。","He has come to sleep well."],
+["私は最近、食欲がありません。","I haven't had much appetite lately."],
+["彼女は健康的な生活を心がけています。","She tries to lead a healthy life."],
+["私はマスクをするようにしています。","I try to wear a mask."],
+["彼は医者から運動をすすめられました。","He was advised by his doctor to exercise."],
+["私は喉が痛いです。","My throat hurts."],
+["彼女は毎晩早めに寝るようにしています。","She tries to go to bed early every night."],
+["私はその症状が続いています。","That symptom has continued."],
+["彼は無理をしすぎているようです。","He seems to be overworking himself."],
+["私は最近、目の調子が良くありません。","My eyes haven't been feeling well lately."],
+["彼女は病み上がりでまだ本調子ではありません。","She has just recovered from illness and isn't back to normal yet."],
+["私は体力をつけるために運動を始めました。","I started exercising to build up my stamina."],
+["彼は健康診断の結果を待っています。","He is waiting for his checkup results."],
+["私はその痛みが徐々におさまってきました。","That pain has gradually eased."],
+["彼女は毎日ビタミン剤を飲んでいます。","She takes vitamins every day."],
+["私は無理せず、少しずつ運動しています。","I'm exercising little by little, without overdoing it."],
+["彼はまだ本調子ではないようです。","He doesn't seem to be back to normal yet."],
+["私は今日、体調が良くなってきました。","I've started to feel better today."],
+["彼女は最近、肌の調子が良いです。","Her skin has been in good condition lately."],
+["おすすめの料理は何ですか？","What do you recommend?"],
+["このレストランは予約が必要ですか？","Does this restaurant require a reservation?"],
+["辛いものは苦手です。","I'm not good with spicy food."],
+["これは何が入っていますか？","What's in this dish?"],
+["お会計をお願いします。","Could I have the check, please?"],
+["このスープはとても美味しいです。","This soup is very delicious."],
+["私はベジタリアン向けのメニューを探しています。","I'm looking for a vegetarian menu."],
+["量を少なめにしてもらえますか？","Could you make the portion smaller?"],
+["このレストランはいつも混んでいます。","This restaurant is always crowded."],
+["私はその味が気に入りました。","I liked that taste."],
+["彼は辛い食べ物が大好きです。","He loves spicy food."],
+["私は毎晩、自炊するようにしています。","I try to cook for myself every night."],
+["このケーキはとても甘いです。","This cake is very sweet."],
+["彼女は料理が上手です。","She is good at cooking."],
+["私はその店の雰囲気が気に入っています。","I like the atmosphere of that place."],
+["このメニューには写真がついています。","This menu has pictures."],
+["私はもう少し塩を控えるようにしています。","I try to reduce salt a little more."],
+["彼はいつも同じ料理を注文します。","He always orders the same dish."],
+["私はその料理のレシピを教えてもらいました。","I was taught the recipe for that dish."],
+["このレストランは地元で人気があります。","This restaurant is popular locally."],
+["私は食後にコーヒーを飲むのが好きです。","I like to drink coffee after a meal."],
+["彼女は健康的な食事を心がけています。","She tries to eat healthy meals."],
+["私はその食材の産地が気になります。","I'm curious about where that ingredient comes from."],
+["このパンは焼きたてです。","This bread is freshly baked."],
+["私は少し食べ過ぎてしまいました。","I ate a little too much."],
+["彼はお酒をあまり飲みません。","He doesn't drink much alcohol."],
+["私はその味付けが少し濃いと感じました。","I felt that the seasoning was a little strong."],
+["このレストランは景色が素晴らしいです。","This restaurant has a wonderful view."],
+["私は久しぶりにこの店に来ました。","I came to this restaurant for the first time in a while."],
+["彼女はアレルギーで卵が食べられません。","She can't eat eggs because of an allergy."],
+["私はテイクアウトを利用することが増えました。","I've started using takeout more often."],
+["このデザートはとても人気があります。","This dessert is very popular."],
+["私はその食べ物を初めて食べました。","I ate that food for the first time."],
+["彼は食にとてもこだわりがあります。","He is very particular about food."],
+["私はコース料理を注文しました。","I ordered a course meal."],
+["このワインはこの料理によく合います。","This wine goes well with this dish."],
+["私は野菜中心の食事に切り替えました。","I switched to a vegetable-centered diet."],
+["彼女はいつも新しいレシピに挑戦しています。","She is always trying new recipes."],
+["私はその店の常連です。","I am a regular at that restaurant."],
+["このお店は深夜まで営業しています。","This restaurant is open until late at night."],
+["私はもう少し量が欲しいです。","I want a little more."],
+["彼は食べるのがとても早いです。","He eats very quickly."],
+["私はその料理を家で再現してみました。","I tried to recreate that dish at home."],
+["このレストランはコストパフォーマンスが良いです。","This restaurant offers good value for money."],
+["私は朝ごはんをしっかり食べるようにしています。","I try to eat a proper breakfast."],
+["彼女は甘いものに目がありません。","She has a weakness for sweets."],
+["私はその味を再現できませんでした。","I couldn't recreate that taste."],
+["このレストランの雰囲気はとても落ち着いています。","The atmosphere of this restaurant is very calm."],
+["私は食べ残しを持ち帰りたいです。","I would like to take the leftovers home."],
+["彼はいつも新しい店を開拓しています。","He is always exploring new restaurants."],
+["私はその意見に少し疑問を感じます。","I feel a little skeptical about that opinion."],
+["彼はいつも自信を持って話します。","He always speaks with confidence."],
+["私はその結果にとても満足しています。","I am very satisfied with that result."],
+["彼女はその知らせを聞いて落ち込んでいました。","She was upset to hear that news."],
+["私はその映画にとても感動しました。","I was very moved by that movie."],
+["彼はその状況にいら立っているようです。","He seems to be frustrated with the situation."],
+["私はその考えに共感します。","I sympathize with that idea."],
+["彼女はいつも周りを気遣います。","She always cares about those around her."],
+["私はそのことについて複雑な気持ちです。","I have mixed feelings about that."],
+["彼はその結果に驚きを隠せませんでした。","He couldn't hide his surprise at the result."],
+["私はその決断を後悔しています。","I regret that decision."],
+["彼女はその話に強く反発しました。","She strongly objected to that story."],
+["私はその状況を前向きに捉えています。","I take that situation positively."],
+["彼はいつも物事を客観的に見ます。","He always looks at things objectively."],
+["私はその結果に少しがっかりしました。","I was a little disappointed with the result."],
+["彼女はその意見に強く賛成しました。","She strongly agreed with that opinion."],
+["私はその出来事にまだ動揺しています。","I'm still shaken by that event."],
+["彼はその変化を歓迎しています。","He welcomes that change."],
+["私はその状況に不安を感じています。","I feel anxious about that situation."],
+["彼女はいつも冷静さを保っています。","She always keeps her composure."],
+["私はその挑戦にわくわくしています。","I'm excited about that challenge."],
+["彼はその批判を真剣に受け止めました。","He took that criticism seriously."],
+["私はその結末に納得できませんでした。","I couldn't accept that outcome."],
+["彼女はその成功を心から喜んでいます。","She is genuinely happy about that success."],
+["私はその発言に少し違和感を覚えました。","I felt a slight discomfort with that remark."],
+["彼はその責任を重く感じています。","He feels the weight of that responsibility."],
+["私はその選択に自信が持てません。","I'm not confident about that choice."],
+["彼女はその状況を冷静に分析しました。","She calmly analyzed that situation."],
+["私はその出来事から多くを学びました。","I learned a lot from that experience."],
+["彼はその意見に賛成しかねます。","He can't quite agree with that opinion."],
+["私はその変化に戸惑っています。","I'm confused by that change."],
+["彼女はその結果を誇りに思っています。","She is proud of that result."],
+["私はその話にとても興味を持ちました。","I became very interested in that story."],
+["彼はその失敗から立ち直りました。","He has recovered from that failure."],
+["私はその決定に責任を感じています。","I feel responsible for that decision."],
+["彼女はその状況を楽観的に見ています。","She sees that situation optimistically."],
+["私はその意見に一理あると思います。","I think there is some truth to that opinion."],
+["彼はその出来事をまだ引きずっています。","He is still dwelling on that event."],
+["私はその挑戦を諦めたくありません。","I don't want to give up on that challenge."],
+["彼女はその批判を気にしていないようです。","She doesn't seem to mind that criticism."],
+["私はその結果を素直に受け止めます。","I will accept that result honestly."],
+["彼はその意見に納得したようです。","He seems to have been convinced by that opinion."],
+["私はその状況を改善したいと思っています。","I want to improve that situation."],
+["彼女はその決断を誇りに思っています。","She is proud of that decision."],
+["私はその件についてまだ迷っています。","I'm still undecided about that matter."],
+["彼はその成功に安堵しているようです。","He seems relieved about that success."],
+["私はその意見に共感できませんでした。","I couldn't relate to that opinion."],
+["彼女はその状況を深刻に受け止めています。","She is taking that situation seriously."],
+["私はその変化を前向きに受け入れています。","I am embracing that change positively."],
+["彼はその結果に責任を感じているようです。","He seems to feel responsible for that result."],
+["今日は昨日より寒いです。","It's colder today than yesterday."],
+["明日の天気予報はどうですか？","What's the weather forecast for tomorrow?"],
+["今週末は晴れるといいですね。","I hope it will be sunny this weekend."],
+["台風が近づいているそうです。","I hear a typhoon is approaching."],
+["今朝は霧が濃かったです。","It was very foggy this morning."],
+["夕方から雨が降り出しました。","It started raining in the evening."],
+["今年の夏はとても暑いです。","This summer is very hot."],
+["彼はどんな天気でも散歩に出かけます。","He goes for a walk regardless of the weather."],
+["私は傘を持ってくるのを忘れました。","I forgot to bring my umbrella."],
+["今日は風がとても強いです。","The wind is very strong today."],
+["この地域は雪がほとんど降りません。","This area rarely gets snow."],
+["私は暖かい季節が好きです。","I like the warm season."],
+["今年は例年より梅雨が長引いています。","This year's rainy season is lasting longer than usual."],
+["彼女は寒さにとても弱いです。","She is very sensitive to cold."],
+["私はその景色にとても感動しました。","I was very moved by that scenery."],
+["今日は一日中曇っていました。","It was cloudy all day today."],
+["私たちは天気が良かったので外で食事をしました。","We ate outside because the weather was nice."],
+["彼はどんな気候にもすぐ慣れます。","He quickly adapts to any climate."],
+["今年は雨が多い年です。","This is a rainy year."],
+["私はその山の景色に息をのみました。","I was breathless at the sight of that mountain."],
+["今朝は氷点下まで気温が下がりました。","The temperature dropped below freezing this morning."],
+["彼女は自然の中で過ごすのが好きです。","She likes spending time in nature."],
+["私はその星空をずっと眺めていました。","I kept looking at that starry sky."],
+["今日は湿度がとても高いです。","The humidity is very high today."],
+["彼はキャンプに行くのが趣味です。","His hobby is going camping."],
+["私はその森の静けさが好きです。","I like the quietness of that forest."],
+["今年の冬は例年より暖かいです。","This winter is warmer than usual."],
+["彼女は海を見るとリラックスできます。","She feels relaxed when she looks at the sea."],
+["私はその川のほとりを散歩しました。","I walked along the riverbank."],
+["今日は久しぶりに青空が見えました。","I saw a clear blue sky for the first time in a while."],
+["彼はいつも天気予報をチェックしています。","He always checks the weather forecast."],
+["私たちはその滝の迫力に圧倒されました。","We were overwhelmed by the power of that waterfall."],
+["今年は花粉がとても多いようです。","There seems to be a lot of pollen this year."],
+["彼女は雨の日でも元気に出かけます。","She goes out energetically even on rainy days."],
+["私はその夕焼けの美しさに驚きました。","I was amazed by the beauty of that sunset."],
+["今日は一日中蒸し暑かったです。","It was humid and hot all day today."],
+["彼はその自然災害の被害を心配しています。","He is worried about the damage from that natural disaster."],
+["私たちはその公園で紅葉を楽しみました。","We enjoyed the autumn leaves at that park."],
+["今年は桜が例年より早く咲きました。","The cherry blossoms bloomed earlier than usual this year."],
+["彼女は星を見るのが好きです。","She likes stargazing."],
+["私はその嵐が過ぎ去るのを待ちました。","I waited for that storm to pass."],
+["今日はとても穏やかな天気です。","The weather is very calm today."],
+["彼は毎朝、空を見上げてから出かけます。","He looks up at the sky before going out every morning."],
+["私たちはその島の自然の豊かさに驚きました。","We were amazed by the richness of that island's nature."],
+["今年の夏は雨がほとんど降りませんでした。","It hardly rained this summer."],
+["彼女はその虹を見て喜びました。","She was delighted to see that rainbow."],
+["私はその自然の美しさに心を奪われました。","I was captivated by the beauty of that nature."],
+["今日は肌寒いので上着が必要です。","It's a bit chilly today, so you'll need a jacket."],
+["彼はその天候の変化にすぐ気づきました。","He noticed that change in the weather right away."],
+["私たちはその夜空の下でキャンプをしました。","We camped under that night sky."],
+["私のパソコンが突然フリーズしました。","My computer suddenly froze."],
+["このアプリの使い方が分かりません。","I don't understand how to use this app."],
+["彼はいつも最新のガジェットを持っています。","He always has the latest gadgets."],
+["Wi-Fiの調子が悪いようです。","The Wi-Fi seems to be having problems."],
+["私はそのソフトをアップデートしました。","I updated that software."],
+["このデータはクラウドに保存されています。","This data is saved in the cloud."],
+["彼はプログラミングを独学で学びました。","He taught himself programming."],
+["私はそのメールをまだ送っていません。","I haven't sent that email yet."],
+["このシステムはよくエラーが起きます。","This system often has errors."],
+["彼女はSNSをあまり使いません。","She doesn't use social media much."],
+["私はパスワードを忘れてしまいました。","I forgot my password."],
+["このデバイスはバッテリーの減りが早いです。","This device's battery runs out quickly."],
+["彼はオンライン会議に参加しています。","He is attending an online meeting."],
+["私はその動画をシェアしました。","I shared that video."],
+["このアプリは操作がとても簡単です。","This app is very easy to use."],
+["彼女は毎日ニュースをスマホでチェックしています。","She checks the news on her phone every day."],
+["私はそのファイルを添付するのを忘れました。","I forgot to attach that file."],
+["このネットワークはセキュリティが強化されています。","This network has enhanced security."],
+["彼はAIの技術にとても詳しいです。","He is very knowledgeable about AI technology."],
+["私はそのアップデートをまだインストールしていません。","I haven't installed that update yet."],
+["このソフトウェアは無料で使えます。","This software can be used for free."],
+["彼女はオンラインで買い物をするのが好きです。","She likes shopping online."],
+["私はそのアカウントを削除しました。","I deleted that account."],
+["このアプリは頻繁にアップデートされます。","This app is updated frequently."],
+["彼はその技術に大きな可能性を感じています。","He sees great potential in that technology."],
+["私はそのメッセージにまだ返信していません。","I haven't replied to that message yet."],
+["このデバイスは操作性がとても良いです。","This device has very good usability."],
+["彼女はテクノロジーの進化に興味があります。","She is interested in the evolution of technology."],
+["私はそのウェブサイトをブックマークしました。","I bookmarked that website."],
+["このシステムは導入が簡単です。","This system is easy to implement."],
+["彼はそのアプリを開発したエンジニアです。","He is the engineer who developed that app."],
+["私はそのデータをバックアップしました。","I backed up that data."],
+["このソフトはセキュリティ面が心配です。","I'm worried about the security of this software."],
+["彼女はリモートで仕事をしています。","She works remotely."],
+["私はそのビデオ通話がうまくつながりませんでした。","That video call didn't connect properly."],
+["このガジェットはとても便利です。","This gadget is very convenient."],
+["彼はSNSで情報を発信しています。","He shares information on social media."],
+["私はそのアプリの通知をオフにしました。","I turned off notifications for that app."],
+["このシステムは古くなってきています。","This system is getting outdated."],
+["彼女はコーディングを勉強し始めました。","She started studying coding."],
+["私はそのファイルを誤って削除してしまいました。","I accidentally deleted that file."],
+["このプラットフォームは利用者が急増しています。","This platform's users are rapidly increasing."],
+["彼はその新しい端末に買い替えました。","He switched to that new device."],
+["私はそのアプリの通知が多すぎると感じています。","I feel that app sends too many notifications."],
+["このネットワークはとても安定しています。","This network is very stable."],
+["彼女はオンライン講座を受講しています。","She is taking an online course."],
+["私はそのシステムの操作に慣れてきました。","I'm getting used to operating that system."],
+["このアプリはデータ使用量が多いです。","This app uses a lot of data."],
+["彼はその技術を仕事に活用しています。","He is utilizing that technology in his work."],
+["私はそのアップデート後、動作が速くなったと感じました。","I felt that the performance improved after that update."],
+["もし時間があれば、手伝ってもらえますか？","If you have time, could you help me?"],
+["彼はもっと勉強しておけばよかったと言っていました。","He said he wished he had studied more."],
+["私がもしあなたなら、そうはしません。","If I were you, I wouldn't do that."],
+["彼女は将来、海外で働きたいと考えています。","She wants to work abroad in the future."],
+["私はもう少し早く準備すべきでした。","I should have prepared a little earlier."],
+["もし雨が降ったら、予定を変更しましょう。","If it rains, let's change our plans."],
+["彼はいつか自分の店を持ちたいと言っています。","He says he wants to have his own shop someday."],
+["私はその選択をもう一度考え直すつもりです。","I intend to reconsider that choice again."],
+["もし可能なら、来週会いませんか？","If possible, shall we meet next week?"],
+["彼女は次の休みに旅行に行くつもりです。","She is planning to travel on her next vacation."],
+["私はもっと早く相談すればよかったです。","I wish I had consulted someone earlier."],
+["もしお時間があれば、ご連絡ください。","If you have time, please contact me."],
+["彼は将来、自分の会社を立ち上げたいそうです。","He says he wants to start his own company in the future."],
+["私はその計画を見直す必要があると思います。","I think we need to review that plan."],
+["もし何か問題があれば、教えてください。","If there is any problem, please let me know."],
+["彼女は来年、資格を取るつもりです。","She plans to get a qualification next year."],
+["私はもう少し慎重に判断するべきでした。","I should have judged more carefully."],
+["もし予算が許せば、それを購入したいです。","If the budget allows, I would like to buy that."],
+["彼は退職後、田舎で暮らしたいと考えています。","He wants to live in the countryside after retirement."],
+["私はその案についてもう少し検討します。","I will consider that idea a little more."],
+["もしその話が本当なら、大変なことです。","If that story is true, it's a serious matter."],
+["彼女は来月から新しい習い事を始めるつもりです。","She is going to start a new hobby next month."],
+["私はその決断を先延ばしにしています。","I have been putting off that decision."],
+["もし迷っているなら、まず試してみてください。","If you're unsure, try it first."],
+["彼はその夢を諦めていないようです。","He doesn't seem to have given up on that dream."],
+["私はその計画を実行に移すつもりです。","I intend to put that plan into action."],
+["もしあなたが賛成なら、進めましょう。","If you agree, let's proceed."],
+["彼女は将来のために貯金をしています。","She is saving money for the future."],
+["私はその件について前もって準備しておきます。","I will prepare in advance for that matter."],
+["もし機会があれば、また挑戦したいです。","If I get the chance, I would like to try again."],
+["彼はその目標に向かって努力しています。","He is working hard toward that goal."],
+["私はその状況を想定していませんでした。","I hadn't anticipated that situation."],
+["もし遅れそうなら、連絡してください。","If you're going to be late, please let me know."],
+["彼女は将来的にはその分野で活躍したいそうです。","She says she wants to be active in that field in the future."],
+["私はその選択肢を除外するつもりはありません。","I don't intend to rule out that option."],
+["もしその案が失敗したら、次を考えましょう。","If that plan fails, let's think of the next one."],
+["彼はその計画を実現させるために動いています。","He is taking action to make that plan a reality."],
+["私はもっと計画的に進めるべきだったと思います。","I think I should have proceeded more systematically."],
+["もし助けが必要なら、いつでも言ってください。","If you need help, feel free to tell me anytime."],
+["彼女はその夢を叶えるために努力を続けています。","She keeps working hard to make that dream come true."],
+["私はその結果を予測していませんでした。","I hadn't predicted that result."],
+["もしそれが本当に必要なら、検討します。","If that is truly necessary, I will consider it."],
+["彼はいつかその国を訪れたいと言っています。","He says he wants to visit that country someday."],
+["私はその機会を逃したくありません。","I don't want to miss that opportunity."],
+["もし状況が変わったら、教えてください。","If the situation changes, please let me know."],
+["彼女は将来に備えて準備を進めています。","She is preparing for the future."],
+["私はもう少し早く決断すべきでした。","I should have made the decision a little sooner."],
+["もしその提案が通れば、大きな前進です。","If that proposal is accepted, it will be a big step forward."],
+["彼はその目標を達成するために計画を立てています。","He is making a plan to achieve that goal."],
+["私はその件について前向きに検討しています。","I am considering that matter positively."]
+];
+
+const STORAGE_KEY = "flashcard-progress-500";
+const META_KEY = "flashcard-meta-500";
+const NEW_CARDS_PER_DAY = 7;
+let progress = null;
+let meta = null;
+let queue = [];
+let currentIndex = 0;
+let revealed = false;
+
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+}
+
+function initProgress() {
+  const p = {};
+  SENTENCES.forEach((_, i) => {
+    p[i] = { box: 0, introduced: true };
+  });
+  return p;
+}
+
+function initMeta() {
+  return { introducedCount: 0, lastIntroDate: null };
+}
+
+async function loadProgress() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    progress = raw ? JSON.parse(raw) : initProgress();
+  } catch (e) {
+    progress = initProgress();
+  }
+  try {
+    const rawMeta = localStorage.getItem(META_KEY);
+    meta = rawMeta ? JSON.parse(rawMeta) : initMeta();
+  } catch (e) {
+    meta = initMeta();
+  }
+}
+
+async function saveProgress() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    localStorage.setItem(META_KEY, JSON.stringify(meta));
+  } catch (e) {
+    console.error("save failed", e);
+  }
+}
+
+function introduceNewCardsIfNeeded() {
+  const today = todayStr();
+  if (meta.lastIntroDate === null) {
+    // first ever run
+    introduceBatch(NEW_CARDS_PER_DAY);
+    meta.lastIntroDate = today;
+    return;
+  }
+  if (meta.lastIntroDate !== today) {
+    // at least one new day has passed since last visit; introduce one day's worth
+    // (kept simple: always exactly one batch per new session on a new day,
+    // so returning after several days off doesn't dump a huge backlog at once)
+    introduceBatch(NEW_CARDS_PER_DAY);
+    meta.lastIntroDate = today;
+  }
+}
+
+function introduceBatch(count) {
+  let introduced = 0;
+  for (let i = 0; i < SENTENCES.length && introduced < count; i++) {
+    if (!progress[i].introduced) {
+      progress[i].introduced = true;
+      meta.introducedCount++;
+      introduced++;
+    }
+  }
+}
+
+function buildQueue() {
+  // Only cards already introduced, and not yet mastered (box < 2), enter today's queue.
+  queue = [];
+  SENTENCES.forEach((_, i) => {
+    if (progress[i].introduced && progress[i].box < 2) queue.push(i);
+  });
+  for (let i = queue.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [queue[i], queue[j]] = [queue[j], queue[i]];
+  }
+}
+
+function renderStatusRow() {
+  let mastered = 0;
+  Object.values(progress).forEach(p => { if (p.box >= 2) mastered++; });
+  const label = document.getElementById("masteredLabel");
+  if (label) label.textContent = `習得済み ${mastered} / ${SENTENCES.length}`;
+}
+
+function renderCard() {
+  const area = document.getElementById("cardArea");
+
+  if (currentIndex >= queue.length) {
+    buildQueue();
+    currentIndex = 0;
+    if (queue.length === 0) {
+      // everything mastered — just loop through all 500 again
+      queue = SENTENCES.map((_, i) => i);
+      for (let i = queue.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [queue[i], queue[j]] = [queue[j], queue[i]];
+      }
+    }
+  }
+
+  const idx = queue[currentIndex];
+  const [jp, en] = SENTENCES[idx];
+  revealed = false;
+
+  area.innerHTML = `
+    <div class="card" id="cardEl">
+      <span class="label">日本語 → 英語</span>
+      <div class="jp">${jp}</div>
+      <div class="en" id="enText">${en}</div>
+      <div class="hint" id="hintText">タップして答えを確認</div>
+    </div>
+    <div class="actions" id="actionsRow" style="display:none;">
+      <button class="btn-again" id="btnAgain">もう一度</button>
+      <button class="btn-good" id="btnGood">言えた</button>
+    </div>
+  `;
+
+  document.getElementById("cardEl").addEventListener("click", reveal);
+  renderStatusRow();
+}
+
+function reveal() {
+  if (revealed) return;
+  revealed = true;
+  document.getElementById("enText").classList.add("shown");
+  document.getElementById("hintText").style.display = "none";
+  document.getElementById("actionsRow").style.display = "flex";
+  document.getElementById("btnAgain").addEventListener("click", (e) => { e.stopPropagation(); answer(false); });
+  document.getElementById("btnGood").addEventListener("click", (e) => { e.stopPropagation(); answer(true); });
+}
+
+async function answer(good) {
+  const idx = queue[currentIndex];
+  if (good) {
+    progress[idx].box = Math.min(2, progress[idx].box + 1);
+  } else {
+    progress[idx].box = 0;
+  }
+  await saveProgress();
+  currentIndex++;
+  renderCard();
+}
+
+async function init() {
+  await loadProgress();
+  await saveProgress();
+  buildQueue();
+  currentIndex = 0;
+  renderCard();
+}
+
+init();
+</script>
+</body>
+</html>
